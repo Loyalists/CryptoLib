@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,7 +30,7 @@ namespace CryptoLib.Service
 
             BitArray text = new BitArray(data);
             BitArray mainKey = new BitArray(deskey.Bytes);
-            var encrypted = DES.Decrypt(text, mainKey);
+            var encrypted = Algorithm.DES.Decrypt(text, mainKey);
             byte[] bytes = new byte[8];
             encrypted.CopyTo(bytes, 0);
             return bytes;
@@ -74,7 +73,7 @@ namespace CryptoLib.Service
 
             BitArray text = new BitArray(data);
             BitArray mainKey = new BitArray(deskey.Bytes);
-            var encrypted = DES.Encrypt(text, mainKey);
+            var encrypted = Algorithm.DES.Encrypt(text, mainKey);
             byte[] bytes = new byte[8];
             encrypted.CopyTo(bytes, 0);
             return bytes;
@@ -100,7 +99,6 @@ namespace CryptoLib.Service
             {
                 bytes.AddRange(block);
             }
-            Console.WriteLine(Convert.ToHexString(bytes.ToArray()));
             string encoded = Convert.ToBase64String(bytes.ToArray());
             return encoded;
         }
