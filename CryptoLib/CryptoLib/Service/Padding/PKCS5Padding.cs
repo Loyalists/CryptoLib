@@ -27,6 +27,11 @@ namespace CryptoLib.Service.Padding
         {
             List<byte> decrypted = data.ToList();
             int padLength = decrypted[decrypted.Count - 1];
+            if (padLength < 0 || padLength > 8)
+            {
+                throw new InvalidOperationException();
+            }
+
             int start = decrypted.Count - padLength;
             decrypted.RemoveRange(start, padLength);
             byte[] message = decrypted.ToArray();
