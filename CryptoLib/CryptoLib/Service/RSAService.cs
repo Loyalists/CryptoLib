@@ -14,6 +14,8 @@ namespace CryptoLib.Service
     public class RSAService : IKeyGenerator<RSAKeyType>, IEncryptor, IDecryptor
     {
         public int KeySize { get; set; } = 1024;
+        public IPaddingScheme? Padding { get; set; } = null;
+
         public async Task<Dictionary<RSAKeyType, IKey>> GenerateAsync()
         {
             Dictionary<RSAKeyType, IKey>? keys = null;
@@ -80,7 +82,7 @@ namespace CryptoLib.Service
             return keys;
         }
 
-        public byte[] Encrypt(byte[] data, IKey key, IPaddingScheme? padding = null)
+        public byte[] Encrypt(byte[] data, IKey key)
         {
             if (key is not RSAPublicKey)
             {
@@ -92,9 +94,9 @@ namespace CryptoLib.Service
             BigInteger e = publicKey.PublicExponent;
             // OS2IP is in unsigned big endian
             byte[] padded = data;
-            if (padding != null)
+            if (Padding != null)
             {
-                padded = padding.Encode(data, key);
+                padded = Padding.Encode(data, key);
             }
 
             BigInteger encoded = new BigInteger(padded, isUnsigned: true, isBigEndian: true);
@@ -108,15 +110,15 @@ namespace CryptoLib.Service
             return encryptedBytes;
         }
 
-        public string Encrypt(string data, IKey key, IPaddingScheme? padding = null)
+        public string Encrypt(string data, IKey key)
         {
             byte[] message = Encoding.UTF8.GetBytes(data);
-            byte[] encrypted = Encrypt(message, key, padding);
+            byte[] encrypted = Encrypt(message, key);
             string encoded = Convert.ToBase64String(encrypted);
             return encoded;
         }
 
-        public byte[] Decrypt(byte[] data, IKey key, IPaddingScheme? padding = null)
+        public byte[] Decrypt(byte[] data, IKey key)
         {
             if (key is not RSAPrivateKey)
             {
@@ -134,18 +136,18 @@ namespace CryptoLib.Service
             BigInteger decrypted = RSA.Decrypt(encrypted, d, n);
             byte[] decryptedBytes = decrypted.ToByteArray(isUnsigned: true, isBigEndian: true);
             byte[] decoded = decryptedBytes;
-            if (padding != null)
+            if (Padding != null)
             {
-                decoded = padding.Decode(decryptedBytes, key);
+                decoded = Padding.Decode(decryptedBytes, key);
             }
 
             return decoded;
         }
 
-        public string Decrypt(string data, IKey key, IPaddingScheme? padding = null)
+        public string Decrypt(string data, IKey key)
         {
             byte[] padded = Convert.FromBase64String(data);
-            byte[] decrypted = Decrypt(padded, key, padding);
+            byte[] decrypted = Decrypt(padded, key);
             string decoded = Encoding.UTF8.GetString(decrypted);
             return decoded;
         }

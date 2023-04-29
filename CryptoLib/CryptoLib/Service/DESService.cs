@@ -1,5 +1,7 @@
 ﻿using CryptoLib.Algorithm;
 using CryptoLib.Algorithm.Key;
+using CryptoLib.Service.Padding;
+using CryptoLib.Service.Mode;
 using CryptoLib.Utility;
 using System;
 using System.Collections;
@@ -11,10 +13,98 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service
 {
-    public class DESService : IKeyGenerator<DESKeyType>
+    public class DESService : IKeyGenerator<DESKeyType>, IEncryptor, IDecryptor
     {
         public string? Passphrase { get; set; }
         public uint Iteration { get; set; } = 4096;
+        public IPaddingScheme? Padding { get; set; } = null;
+        public IBlockCipherMode? BlockCipherMode { get; set; } = null;
+        private int blockSize = 8;
+
+        public byte[] Decrypt(byte[] data, IKey key)
+        {
+            DESKey? deskey = key as DESKey;
+            if (deskey == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            BitArray text = new BitArray(data);
+            BitArray mainKey = new BitArray(deskey.Bytes);
+            var encrypted = DES.Decrypt(text, mainKey);
+            byte[] bytes = new byte[8];
+            encrypted.CopyTo(bytes, 0);
+            return bytes;
+        }
+
+        public string Decrypt(string data, IKey key)
+        {
+            if (Padding == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (BlockCipherMode == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            byte[] encrypted = Convert.FromBase64String(data);
+            List<byte[]> encryptedBlocks = Helper.SplitByCount(encrypted, blockSize);
+            List<byte[]> decrypted = BlockCipherMode.BlockDecrypt(encryptedBlocks, key);
+            List<byte> bytes = new List<byte>();
+            for (int i = 0; i < decrypted.Count; i++)
+            {
+                byte[] block = decrypted[i];
+                bytes.AddRange(block);
+            }
+
+            byte[] decodedMessage = Padding.Decode(bytes.ToArray(), key);
+            string decoded = Encoding.UTF8.GetString(decodedMessage);
+            return decoded;
+        }
+
+        public byte[] Encrypt(byte[] data, IKey key)
+        {
+            DESKey? deskey = key as DESKey;
+            if (deskey == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            BitArray text = new BitArray(data);
+            BitArray mainKey = new BitArray(deskey.Bytes);
+            var encrypted = DES.Encrypt(text, mainKey);
+            byte[] bytes = new byte[8];
+            encrypted.CopyTo(bytes, 0);
+            return bytes;
+        }
+
+        public string Encrypt(string data, IKey key)
+        {
+            if (Padding == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (BlockCipherMode == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            byte[] message = Padding.Encode(Encoding.UTF8.GetBytes(data), key);
+            List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
+            List<byte[]> encrypted = BlockCipherMode.BlockEncrypt(messageBlocks, key);
+            List<byte> bytes = new List<byte>();
+            foreach (byte[] block in encrypted)
+            {
+                bytes.AddRange(block);
+            }
+            Console.WriteLine(Convert.ToHexString(bytes.ToArray()));
+            string encoded = Convert.ToBase64String(bytes.ToArray());
+            return encoded;
+        }
+
         public Dictionary<DESKeyType, IKey> Generate()
         {
             if (Passphrase == null)

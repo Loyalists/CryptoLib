@@ -10,6 +10,6 @@ namespace CryptoLib.Service
 {
     public interface IEncryptor
     {
-        byte[] Encrypt(byte[] data, IKey key, IPaddingScheme? padding = null);
+        byte[] Encrypt(byte[] data, IKey key);
     }
 }

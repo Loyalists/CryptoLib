@@ -12,6 +12,7 @@ using CryptoLib.Service;
 using CryptoLib.Service.Format;
 using CryptoLib.Service.Padding;
 using CryptoLib.Utility;
+using CryptoLib.Service.Mode;
 
 namespace CryptoLib.Test
 {
@@ -22,6 +23,7 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             RSAService service = new RSAService();
             service.KeySize = 1024;
+            service.Padding = new PKCS1Padding();
             var publicKeyFormat = new RSAPublicKeyPKCS8();
             var privateKeyFormat = new RSAPrivateKeyPKCS1();
 
@@ -49,15 +51,14 @@ namespace CryptoLib.Test
             Console.WriteLine("plainText:");
             Console.WriteLine(plainText);
 
-            IPaddingScheme? padding = new PKCS1Padding();
             sw.Restart();
-            string encrypted = service.Encrypt(plainText, publicKey, padding);
+            string encrypted = service.Encrypt(plainText, publicKey);
             double time_enc = sw.Elapsed.TotalSeconds;
             Console.WriteLine("encrypted:");
             Console.WriteLine(encrypted);
 
             sw.Restart();
-            string decoded = service.Decrypt(encrypted, privateKey, padding);
+            string decoded = service.Decrypt(encrypted, privateKey);
             double time_dec = sw.Elapsed.TotalSeconds;
             Console.WriteLine("decoded:");
             Console.WriteLine(decoded);
@@ -82,21 +83,35 @@ namespace CryptoLib.Test
         {
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             string passphrase = "lol";
+            string message = "The quick brown fox jumps over the lazy dog";
             DESService service = new DESService();
             service.Passphrase = passphrase;
+            service.Padding = new PKCS5Padding();
+            service.BlockCipherMode = new ECBMode(service);
             var keys = service.Generate();
             DESKey key = (DESKey)keys[DESKeyType.Key];
+            Console.WriteLine("key:");
             Console.WriteLine(key);
-            BitArray text = new BitArray(64);
-            BitArray mainKey = new BitArray(key.Bytes);
-            var encrypted = DES.Encrypt(text, mainKey);
-            byte[] num = new byte[8];
-            encrypted.CopyTo(num, 0);
-            Console.WriteLine(Convert.ToHexString(num));
+            Console.WriteLine("message:");
+            Console.WriteLine(message);
 
-            var decrypted = DES.Decrypt(encrypted, mainKey);
-            decrypted.CopyTo(num, 0);
-            Console.WriteLine(Convert.ToHexString(num));
+            var encrypted = service.Encrypt(message, key);
+            Console.WriteLine("encrypted:");
+            Console.WriteLine(encrypted);
+
+            var decrypted = service.Decrypt(encrypted, key);
+            Console.WriteLine("decrypted:");
+            Console.WriteLine(decrypted);
+
+            if (decrypted == message)
+            {
+                Console.WriteLine("DES implementation is valid.");
+            }
+            else
+            {
+                Console.WriteLine("DES implementation is NOT valid.");
+            }
+
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 

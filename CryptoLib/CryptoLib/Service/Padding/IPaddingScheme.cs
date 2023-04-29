@@ -9,7 +9,7 @@ namespace CryptoLib.Service.Padding
 {
     public interface IPaddingScheme
     {
-        byte[] Encode(byte[] data, IKey key);
-        byte[] Decode(byte[] data, IKey key);
+        byte[] Encode(byte[] data, IKey? key);
+        byte[] Decode(byte[] data, IKey? key);
     }
 }

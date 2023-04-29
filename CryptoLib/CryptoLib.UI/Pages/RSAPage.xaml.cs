@@ -135,10 +135,11 @@ namespace CryptoLib.UI.Pages
             IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(selectedPaddingScheme);
             int keySize = publicKey.GetKeySize();
             RSAService service = new RSAService();
+            service.Padding = padding;
             service.KeySize = keySize;
             try
             {
-                string encryptedText = service.Encrypt(plainText, publicKey, padding);
+                string encryptedText = service.Encrypt(plainText, publicKey);
                 EncryptedTextBox.Text = encryptedText;
             }
             catch (Exception ex)
@@ -185,11 +186,12 @@ namespace CryptoLib.UI.Pages
             IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(selectedPaddingScheme);
             int keySize = privateKey.GetKeySize();
             RSAService service = new RSAService();
+            service.Padding = padding;
             service.KeySize = keySize;
 
             try
             {
-                string decryptedText = service.Decrypt(encryptedText, privateKey, padding);
+                string decryptedText = service.Decrypt(encryptedText, privateKey);
                 PlainTextBox.Text = decryptedText;
             }
             catch (Exception ex)

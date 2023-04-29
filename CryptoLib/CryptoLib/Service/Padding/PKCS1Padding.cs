@@ -22,7 +22,7 @@ namespace CryptoLib.Service.Padding
             return result;
         }
 
-        public byte[] Encode(byte[] data, IKey key)
+        public byte[] Encode(byte[] data, IKey? key)
         {
             if (key is not RSAPublicKey)
             {
@@ -58,13 +58,8 @@ namespace CryptoLib.Service.Padding
             return padded;
         }
 
-        public byte[] Decode(byte[] data, IKey key)
+        public byte[] Decode(byte[] data, IKey? key = null)
         {
-            if (key is not RSAPrivateKey)
-            {
-                throw new InvalidCastException();
-            }
-
             List<byte> decryptedBytes = data.ToList();
 
             int pos = 0;
