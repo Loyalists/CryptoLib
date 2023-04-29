@@ -119,6 +119,18 @@ namespace CryptoLib.Service
             {
                 ba.Length = 8;
                 bool[] ba2 = BitHelper.ConvertBitsToBoolArray(ba);
+                int count = 0;
+                foreach (bool b in ba2)
+                {
+                    if (b == true) 
+                    {
+                        count++;
+                    }
+                }
+                if (count % 2 != 0)
+                {
+                    ba2[7] = true;
+                }
                 bools.AddRange(ba2);
             }
 
