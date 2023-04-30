@@ -115,7 +115,7 @@ namespace CryptoLib.Service
             foreach (BitArray ba in list)
             {
                 ba.Length = 8;
-                bool[] ba2 = BitHelper.ConvertBitsToBools(ba);
+                bool[] ba2 = ba.ConvertBitsToBools();
                 int count = 0;
                 foreach (bool b in ba)
                 {

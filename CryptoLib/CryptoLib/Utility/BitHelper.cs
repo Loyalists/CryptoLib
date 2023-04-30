@@ -60,7 +60,7 @@ namespace CryptoLib.Utility
         }
 
         // https://stackoverflow.com/questions/5283180/how-can-i-convert-bitarray-to-single-int
-        public static T ConvertBitsToNumeric<T>(BitArray bits, bool isBigEndian = false)
+        public static T ConvertBitsToNumeric<T>(this BitArray bits, bool isBigEndian = false)
         {
             if (bits.Length > 32)
             {
@@ -78,14 +78,14 @@ namespace CryptoLib.Utility
             return bytes[0];
         }
 
-        public static bool[] ConvertBitsToBools(BitArray bits)
+        public static bool[] ConvertBitsToBools(this BitArray bits)
         {
             bool[] ret = new bool[bits.Length];
             bits.CopyTo(ret, 0);
             return ret;
         }
 
-        public static byte[] ConvertBitsToBytes(BitArray bits)
+        public static byte[] ConvertBitsToBytes(this BitArray bits)
         {
             byte[] ret = new byte[(bits.Length - 1) / 8 + 1];
             bits.CopyTo(ret, 0);
@@ -94,7 +94,7 @@ namespace CryptoLib.Utility
 
         public static List<BitArray> SplitBitsByCount(this BitArray source, int chunkMaxSize)
         {
-            bool[] _block = ConvertBitsToBools(source);
+            bool[] _block = source.ConvertBitsToBools();
             List<bool[]> split = Helper.SplitByCount(_block, chunkMaxSize);
             List<BitArray> bitArrays = new List<BitArray>(split.Count);
             for (int i = 0; i < split.Count; i++)
@@ -106,7 +106,7 @@ namespace CryptoLib.Utility
 
         public static void PrintBitArray(BitArray bits)
         {
-            byte[] bytes = ConvertBitsToBytes(bits);
+            byte[] bytes = bits.ConvertBitsToBytes();
             Console.WriteLine(Convert.ToHexString(bytes));
         }
     }

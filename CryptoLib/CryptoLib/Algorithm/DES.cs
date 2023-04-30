@@ -166,8 +166,8 @@ namespace CryptoLib.Algorithm
 
             BitArray outer = new BitArray(new bool[] { block[0], block[5] });
             BitArray inner = new BitArray(new bool[] { block[1], block[2], block[3], block[4] });
-            byte row = BitHelper.ConvertBitsToNumeric<byte>(outer, true);
-            byte column = BitHelper.ConvertBitsToNumeric<byte>(inner, true);
+            byte row = outer.ConvertBitsToNumeric<byte>(true);
+            byte column = inner.ConvertBitsToNumeric<byte>(true);
             byte target = sbox[row, column];
             return target;
         }
