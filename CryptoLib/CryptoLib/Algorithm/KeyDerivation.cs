@@ -57,7 +57,7 @@ namespace CryptoLib.Algorithm
             for (int i = 1; i < iteration; i++)
             {
                 byte[] u = uList[i];
-                xor_result = MathHelper.XORByteArray(xor_result, u);
+                xor_result = MathHelper.XORBytes(xor_result, u);
             }
 
             return xor_result;

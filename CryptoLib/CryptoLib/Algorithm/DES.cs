@@ -55,7 +55,7 @@ namespace CryptoLib.Algorithm
         private static void EncryptRound(byte[] leftBlock, byte[] rightBlock, byte[] subkey, out byte[] retLeftBlock, out byte[] retRightBlock)
         {
             byte[] f = FeistelFunction(rightBlock, subkey);
-            byte[] result = MathHelper.XORByteArray(leftBlock, f);
+            byte[] result = MathHelper.XORBytes(leftBlock, f);
             retLeftBlock = new byte[rightBlock.Length];
             rightBlock.CopyTo(retLeftBlock, 0);
             retRightBlock = result;
@@ -115,7 +115,7 @@ namespace CryptoLib.Algorithm
 
         public static byte[] KeyMixing(byte[] block, byte[] subkey)
         {
-            byte[] xor = MathHelper.XORByteArray(block, subkey);
+            byte[] xor = MathHelper.XORBytes(block, subkey);
             return xor;
         }
 
