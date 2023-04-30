@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CryptoLib.Algorithm;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,53 @@ namespace CryptoLib.Utility
 {
     public static class BitHelper
     {
-        // https://stackoverflow.com/questions/4854207/get-a-specific-bit-from-byte
-        public static bool GetBit(this byte b, int bitNumber)
+        // https://github.com/pStrachota/DES_KRYPTO_PROJECT
+        public static byte[] SetBit(this byte[] self, int index, bool value)
         {
-            return (b & (1 << bitNumber)) != 0;
+            int byteIndex = index / 8;
+            int bitIndex = index % 8;
+            int val = Convert.ToInt32(value);
+
+            byte oldByte = self[byteIndex];
+            oldByte = (byte)(((0xFF7F >> bitIndex) & oldByte) & 0x00FF);
+            byte newByte = (byte)((val << (7 - bitIndex)) | oldByte);
+            self[byteIndex] = newByte;
+            return self;
+        }
+
+        public static bool GetBit(this byte[] self, int index)
+        {
+            int byteIndex = index / 8;
+            int bitIndex = index % 8;
+            byte valByte = self[byteIndex];
+            int valInt = valByte >> (7 - bitIndex) & 1;
+            bool b = Convert.ToBoolean(valInt);
+            return b;
+        }
+
+        public static byte[] SelectBits(byte[] inner, int pos, int len)
+        {
+            int numOfBytes = (len - 1) / 8 + 1;
+            byte[] outer = new byte[numOfBytes];
+            for (int i = 0; i < len; i++)
+            {
+                bool val = inner.GetBit(pos + i);
+                outer.SetBit(i, val);
+            }
+
+            return outer;
+        }
+
+        public static byte[] LeftRotate(byte[] inner, int len, int step)
+        {
+            byte[] outer = new byte[(len - 1) / 8 + 1];
+            for (int i = 0; i < len; i++)
+            {
+                bool val = inner.GetBit((i + step) % len);
+                outer.SetBit(i, val);
+            }
+
+            return outer;
         }
 
         // https://stackoverflow.com/questions/5283180/how-can-i-convert-bitarray-to-single-int
@@ -34,7 +78,7 @@ namespace CryptoLib.Utility
             return bytes[0];
         }
 
-        public static bool[] ConvertBitsToBoolArray(BitArray bits)
+        public static bool[] ConvertBitsToBools(BitArray bits)
         {
             bool[] ret = new bool[bits.Length];
             bits.CopyTo(ret, 0);
@@ -50,7 +94,7 @@ namespace CryptoLib.Utility
 
         public static List<BitArray> SplitBitsByCount(this BitArray source, int chunkMaxSize)
         {
-            bool[] _block = ConvertBitsToBoolArray(source);
+            bool[] _block = ConvertBitsToBools(source);
             List<bool[]> split = Helper.SplitByCount(_block, chunkMaxSize);
             List<BitArray> bitArrays = new List<BitArray>(split.Count);
             for (int i = 0; i < split.Count; i++)
@@ -58,6 +102,12 @@ namespace CryptoLib.Utility
                 bitArrays.Add(new BitArray(split[i]));
             }
             return bitArrays;
+        }
+
+        public static void PrintBitArray(BitArray bits)
+        {
+            byte[] bytes = ConvertBitsToBytes(bits);
+            Console.WriteLine(Convert.ToHexString(bytes));
         }
     }
 }

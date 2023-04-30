@@ -28,10 +28,9 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            BitArray text = new BitArray(data);
             BitArray mainKey = new BitArray(deskey.Bytes);
-            var encrypted = Algorithm.DES.Decrypt(text, mainKey);
-            byte[] bytes = new byte[8];
+            var encrypted = Algorithm.DES.Decrypt(data, deskey.Bytes);
+            byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
         }
@@ -71,10 +70,8 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            BitArray text = new BitArray(data);
-            BitArray mainKey = new BitArray(deskey.Bytes);
-            var encrypted = Algorithm.DES.Encrypt(text, mainKey);
-            byte[] bytes = new byte[8];
+            var encrypted = Algorithm.DES.Encrypt(data, deskey.Bytes);
+            byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
         }
@@ -118,9 +115,9 @@ namespace CryptoLib.Service
             foreach (BitArray ba in list)
             {
                 ba.Length = 8;
-                bool[] ba2 = BitHelper.ConvertBitsToBoolArray(ba);
+                bool[] ba2 = BitHelper.ConvertBitsToBools(ba);
                 int count = 0;
-                foreach (bool b in ba2)
+                foreach (bool b in ba)
                 {
                     if (b == true) 
                     {

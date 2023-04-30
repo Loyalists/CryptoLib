@@ -1,4 +1,5 @@
-﻿using CryptoLib.Utility;
+﻿using CryptoLib.Algorithm.Key;
+using CryptoLib.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,135 +11,153 @@ namespace CryptoLib.Algorithm
 {
     public static class DES
     {
-        public static BitArray Encrypt(BitArray plainText, BitArray key, bool isDecryption = false)
+        public static byte[] Encrypt(byte[] plainText, byte[] key, bool isDecryption = false)
         {
-            if (plainText.Count != 64)
+            if (plainText.Length != 8)
             {
                 throw new InvalidOperationException();
             }
 
-            if (key.Count != 64)
+            if (key.Length != 8)
             {
                 throw new InvalidOperationException();
             }
 
-            List<BitArray> subkeys = KeySchedule(key);
+            List<byte[]> subkeys = KeySchedule(key);
             if (isDecryption)
             {
                 subkeys.Reverse();
             }
 
-            BitArray leftBlock;
-            BitArray rightBlock;
+            byte[] leftBlock;
+            byte[] rightBlock;
             InitialPermutation(plainText, out leftBlock, out rightBlock);
             for (int i = 0; i < subkeys.Count; i++)
             {
-                BitArray subkey = subkeys[i];
-                BitArray retLeftBlock;
-                BitArray retRightBlock;
+                byte[] subkey = subkeys[i];
+                byte[] retLeftBlock;
+                byte[] retRightBlock;
                 EncryptRound(leftBlock, rightBlock, subkey, out retLeftBlock, out retRightBlock);
                 leftBlock = retLeftBlock;
                 rightBlock = retRightBlock;
             }
 
-            BitArray result = FinalPermutation(rightBlock, leftBlock);
+            byte[] result = FinalPermutation(rightBlock, leftBlock);
             return result;
         }
 
-        public static BitArray Decrypt(BitArray plainText, BitArray key)
+        public static byte[] Decrypt(byte[] plainText, byte[] key)
         {
-            BitArray result = Encrypt(plainText, key, true);
+            byte[] result = Encrypt(plainText, key, true);
             return result;
         }
 
-        private static void EncryptRound(BitArray leftBlock, BitArray rightBlock, BitArray subkey, out BitArray retLeftBlock, out BitArray retRightBlock)
+        private static void EncryptRound(byte[] leftBlock, byte[] rightBlock, byte[] subkey, out byte[] retLeftBlock, out byte[] retRightBlock)
         {
-            BitArray result = leftBlock.Xor(FeistelFunction(rightBlock, subkey));
-            retLeftBlock = new BitArray(rightBlock);
+            byte[] f = FeistelFunction(rightBlock, subkey);
+            byte[] result = MathHelper.XORByteArray(leftBlock, f);
+            retLeftBlock = new byte[rightBlock.Length];
+            rightBlock.CopyTo(retLeftBlock, 0);
             retRightBlock = result;
         }
 
-        public static void InitialPermutation(BitArray block, out BitArray leftBlock, out BitArray rightBlock)
+        public static void InitialPermutation(byte[] block, out byte[] leftBlock, out byte[] rightBlock)
         {
-            BitArray permuted = new BitArray(block.Length);
-            for (int i = 0; i < block.Length; i++)
+            int bitSize = block.Length * 8;
+            byte[] permuted = new byte[block.Length];
+            for (int i = 0; i < bitSize; i++)
             {
                 int position = IPTable[i] - 1;
-                permuted[i] = block[position];
+                bool value = block.GetBit(position);
+                permuted.SetBit(i, value);
             }
-
-            List<BitArray> bitArrays = BitHelper.SplitBitsByCount(permuted, permuted.Length / 2);
-            leftBlock = bitArrays[0];
-            rightBlock = bitArrays[1];
+            leftBlock = BitHelper.SelectBits(permuted, 0, bitSize / 2);
+            rightBlock = BitHelper.SelectBits(permuted, bitSize / 2, bitSize / 2);
         }
 
-        public static BitArray FinalPermutation(BitArray leftBlock, BitArray rightBlock)
+        public static byte[] FinalPermutation(byte[] leftBlock, byte[] rightBlock)
         {
-            bool[] _L = BitHelper.ConvertBitsToBoolArray(leftBlock);
-            bool[] _R = BitHelper.ConvertBitsToBoolArray(rightBlock);
-            bool[] _merged = _L.Concat(_R).ToArray();
-            BitArray merged = new BitArray(_merged);
-            BitArray permuted = new BitArray(merged.Length);
-            for (int i = 0; i < merged.Length; i++)
+            int byteSize = leftBlock.Length + rightBlock.Length;
+            int bitSize = byteSize * 8;
+            byte[] merged = leftBlock.Concat(rightBlock).ToArray();
+            byte[] permuted = new byte[byteSize];
+            for (int i = 0; i < bitSize; i++)
             {
                 int position = FPTable[i] - 1;
-                permuted[i] = merged[position];
+                bool value = merged.GetBit(position);
+                permuted.SetBit(i, value);
             }
             return permuted;
         }
 
-        public static BitArray FeistelFunction(BitArray block, BitArray subkey)
+        public static byte[] FeistelFunction(byte[] block, byte[] subkey)
         {
-            BitArray expanded = Expansion(block);
-            BitArray mixed = KeyMixing(expanded, subkey);
-            BitArray sub = Substitution(mixed);
-            BitArray permuted = Permutation(sub);
+            byte[] expanded = Expansion(block);
+            byte[] mixed = KeyMixing(expanded, subkey);
+            byte[] sub = Substitution(mixed);
+            byte[] permuted = Permutation(sub);
             return permuted;
         }
 
-        public static BitArray Expansion(BitArray block)
+        public static byte[] Expansion(byte[] block)
         {
-            int size = 48;
-            BitArray permuted = new BitArray(size);
-            for (int i = 0; i < size; i++)
+            int byteSize = 6;
+            int bitSize = byteSize * 8;
+            byte[] permuted = new byte[byteSize];
+            for (int i = 0; i < bitSize; i++)
             {
                 int position = ETable[i] - 1;
-                permuted[i] = block[position];
+                bool value = block.GetBit(position);
+                permuted.SetBit(i, value);
             }
             return permuted;
         }
 
-        public static BitArray KeyMixing(BitArray block, BitArray subkey)
+        public static byte[] KeyMixing(byte[] block, byte[] subkey)
         {
-            BitArray xor = block.Xor(subkey);
+            byte[] xor = MathHelper.XORByteArray(block, subkey);
             return xor;
         }
 
-        public static BitArray Substitution(BitArray block)
+        public static byte[] Substitution(byte[] block)
         {
-            List<BitArray> blocks = BitHelper.SplitBitsByCount(block, 6);
-            if (blocks.Count != 8)
+            int byteSize = 4;
+            int bitSize = byteSize * 8;
+            int blockCount = 8;
+            List<BitArray> blocks = new List<BitArray>(blockCount);
+            for (int i = 0; i < blockCount; i++)
             {
-                throw new Exception();
+                bool[] num = new bool[6];
+                for (int j = 0; j < 6; j++)
+                {
+                    bool value = block.GetBit(i * 6 + j);
+                    num[j] = value;
+                }
+                BitArray blockBA = new BitArray(num);
+                blocks.Add(blockBA);
             }
 
-            List<bool> boolList = new List<bool>(32);
-            for (int i = 0; i < blocks.Count; i++)
+            byte[] result = new byte[byteSize];
+            List<byte> outputs = new List<byte>(8);
+            for (int i = 0; i < blockCount; i++)
             {
-                BitArray output = SubstitutionLookup(blocks[i], Sboxes[i]);
-                boolList.AddRange(BitHelper.ConvertBitsToBoolArray(output));
+                byte output = SubstitutionLookup(blocks[i], Sboxes[i]);
+                outputs.Add(output);
             }
 
-            if (boolList.Count != 32)
+            int idx = 0;
+            int[] idx_list = new int[] { 0, 2, 4, 6 };
+            foreach (int i in idx_list)
             {
-                throw new Exception();
+                byte num = (byte)(outputs[i] << 4 | outputs[i + 1]);
+                result[idx] = num;
+                idx++;
             }
 
-            BitArray result = new BitArray(boolList.ToArray());
             return result;
         }
 
-        private static BitArray SubstitutionLookup(BitArray block, byte[,] sbox)
+        private static byte SubstitutionLookup(BitArray block, byte[,] sbox)
         {
             if (block.Length != 6)
             {
@@ -150,62 +169,83 @@ namespace CryptoLib.Algorithm
             byte row = BitHelper.ConvertBitsToNumeric<byte>(outer, true);
             byte column = BitHelper.ConvertBitsToNumeric<byte>(inner, true);
             byte target = sbox[row, column];
-            BitArray result = new BitArray(new byte[] { target });
-            result.Length = 4;
-            return result;
+            return target;
         }
 
-        public static BitArray Permutation(BitArray block)
+        public static byte[] Permutation(byte[] block)
         {
-            BitArray permuted = new BitArray(block.Count);
-            for (int i = 0; i < block.Count; i++)
+            int byteSize = 4;
+            int bitSize = byteSize * 8;
+            byte[] permuted = new byte[byteSize];
+            for (int i = 0; i < bitSize; i++)
             {
                 int position = Pbox[i] - 1;
-                permuted[i] = block[position];
+                bool value = block.GetBit(position);
+                permuted.SetBit(i, value);
             }
 
             return permuted;
         }
 
-        public static List<BitArray> KeySchedule(BitArray key)
+        public static List<byte[]> KeySchedule(byte[] key)
         {
-            bool[] leftKey = new bool[28];
-            bool[] rightKey = new bool[28];
-            for (int i = 0; i < leftKey.Length; i++)
+            int keySize = 7;
+            byte[] LRKey = new byte[keySize];
+            for (int i = 0; i < keySize * 8; i++)
             {
-                int positionL = PC1LTable[i] - 1;
-                int positionR = PC1RTable[i] - 1;
-                leftKey[i] = key[positionL];
-                rightKey[i] = key[positionR];
+                int position = PC1Table[i] - 1;
+                bool value = key.GetBit(position);
+                LRKey.SetBit(i, value);
             }
 
+            byte[] leftKey = BitHelper.SelectBits(LRKey, 0, 28);
+            byte[] rightKey = BitHelper.SelectBits(LRKey, 28, 28);
+
             int subkeyCount = 16;
-            List<BitArray> subkeys = new List<BitArray>(subkeyCount);
+            List<byte[]> subkeys = new List<byte[]>(subkeyCount);
             for (int i = 0; i < subkeyCount; i++)
             {
                 int rotation = BitsRotation[i];
-                Helper.LeftRotateArray(leftKey, rotation);
-                Helper.LeftRotateArray(rightKey, rotation);
-                BitArray subkey = KeyScheduleGetSubkey(leftKey, rightKey);
+                leftKey = BitHelper.LeftRotate(leftKey, 28, rotation);
+                rightKey = BitHelper.LeftRotate(rightKey, 28, rotation);
+                byte[] subkey = GetSubkey(leftKey, rightKey);
                 subkeys.Add(subkey);
             }
             return subkeys;
         }
 
-        private static BitArray KeyScheduleGetSubkey(bool[] leftKey, bool[] rightKey)
+        private static byte[] GetSubkey(byte[] leftKey, byte[] rightKey)
         {
-            List<bool> _key = new List<bool>(leftKey.Length + rightKey.Length);
-            _key.AddRange(leftKey);
-            _key.AddRange(rightKey);
-            int subkeySize = 48;
-            bool[] subkey = new bool[subkeySize];
-            for (int i = 0; i < subkeySize; i++)
+            byte[] concat = MergeKey(leftKey, rightKey);
+            int subkeySize = 6;
+            byte[] subkey = new byte[subkeySize];
+            for (int i = 0; i < subkeySize * 8; i++)
             {
                 int position = PC2Table[i] - 1;
-                subkey[i] = _key[position];
+                bool value = concat.GetBit(position);
+                subkey.SetBit(i, value);
             }
-            BitArray subkeyBA = new BitArray(subkey);
-            return subkeyBA;
+            return subkey;
+        }
+
+        private static byte[] MergeKey(byte[] leftKey, byte[] rightKey)
+        {
+            byte[] result = new byte[7];
+            for (int i = 0; i < 3; i++)
+            {
+                result[i] = leftKey[i];
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                bool val = leftKey.GetBit(24 + i);
+                result.SetBit(24 + i, val);
+            }
+            for (int i = 0; i < 28; i++)
+            {
+                bool val = rightKey.GetBit(i);
+                result.SetBit(28 + i, val);
+            }
+            return result;
         }
 
         public static readonly byte[,] Sbox1 = new byte[,]
@@ -322,16 +362,12 @@ namespace CryptoLib.Algorithm
             19, 13, 30, 6, 22, 11, 4, 25,
         };
 
-        public static readonly int[] PC1LTable = new int[]
+        public static readonly int[] PC1Table = new int[]
         {
             57, 49, 41, 33, 25, 17, 9,
             1, 58, 50, 42, 34, 26, 18,
             10, 2, 59, 51, 43, 35, 27,
             19, 11, 3, 60, 52, 44, 36,
-        };
-
-        public static readonly int[] PC1RTable = new int[]
-        {
             63, 55, 47, 39, 31, 23, 15,
             7, 62, 54, 46, 38, 30, 22,
             14, 6, 61, 53, 45, 37, 29,
@@ -353,29 +389,6 @@ namespace CryptoLib.Algorithm
         public static readonly int[] BitsRotation = new int[]
         {
             1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
-        };
-
-        public static readonly int[,] PermutationMatrix = new int[,]
-        {
-            { 57, 49, 41, 33, 25, 17, 9, 1 },
-            { 58, 50, 42, 34, 26, 18, 10, 2 },
-            { 59, 51, 43, 35, 27, 19, 11, 3 },
-            { 60, 52, 44, 36, 63, 55, 47, 39 },
-            { 31, 23, 15, 7, 62, 54, 46, 38 },
-            { 30, 22, 14, 6, 61, 53, 45, 37 },
-            { 29, 21, 13, 5, 28, 20, 12, 4 },
-        };
-
-        public static readonly int[,] KeyCompressionMatrix = new int[,]
-        {
-            { 14, 17, 11, 24, 1, 5 },
-            { 3, 28, 15, 6, 21, 10 },
-            { 23, 19, 12, 4, 26, 8 },
-            { 16, 7, 27, 20, 13, 2 },
-            { 41, 52, 31, 37, 47, 55 },
-            { 30, 40, 51, 45, 33, 48 },
-            { 44, 49, 39, 56, 34, 53 },
-            { 46, 42, 50, 36, 29, 32 },
         };
     }
 }

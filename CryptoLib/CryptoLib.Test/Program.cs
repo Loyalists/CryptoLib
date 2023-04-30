@@ -97,8 +97,8 @@ namespace CryptoLib.Test
 
             var encrypted = service.Encrypt(message, key);
             Console.WriteLine("encrypted:");
-            Console.WriteLine(Convert.ToHexString(Convert.FromBase64String(encrypted)));
             Console.WriteLine(encrypted);
+            Console.WriteLine(Convert.ToHexString(Convert.FromBase64String(encrypted)));
 
             var decrypted = service.Decrypt(encrypted, key);
             Console.WriteLine("decrypted:");
@@ -112,7 +112,6 @@ namespace CryptoLib.Test
             {
                 Console.WriteLine("DES implementation is NOT valid.");
             }
-
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
