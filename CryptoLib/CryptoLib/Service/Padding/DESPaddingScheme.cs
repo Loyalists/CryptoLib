@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Padding
 {
-    public enum SupportedDESPaddingScheme
+    public enum DESPaddingScheme
     {
         PKCS5,
     }
 
-    public static class DESPaddingScheme
+    public static class DESPaddingSchemeFactory
     {
-        public static Dictionary<SupportedDESPaddingScheme, Type> PaddingSchemeMap = new Dictionary<SupportedDESPaddingScheme, Type>()
+        public static Dictionary<DESPaddingScheme, Type> PaddingSchemeMap = new Dictionary<DESPaddingScheme, Type>()
         {
-            { SupportedDESPaddingScheme.PKCS5, typeof(PKCS5Padding) },
+            { DESPaddingScheme.PKCS5, typeof(PKCS5Padding) },
         };
 
-        public static IPaddingScheme CreateInstance(SupportedDESPaddingScheme padding)
+        public static IPaddingScheme CreateInstance(DESPaddingScheme padding)
         {
             Type? type = PaddingSchemeMap[padding];
             if (type == null)

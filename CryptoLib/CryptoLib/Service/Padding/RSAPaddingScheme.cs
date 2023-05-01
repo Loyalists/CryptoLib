@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Padding
 {
-    public enum SupportedRSAPaddingScheme
+    public enum RSAPaddingScheme
     {
         Textbook,
         PKCS1,
     }
 
-    public static class RSAPaddingScheme
+    public static class RSAPaddingSchemeFactory
     {
-        public static Dictionary<SupportedRSAPaddingScheme, Type?> PaddingSchemeMap = new Dictionary<SupportedRSAPaddingScheme, Type?>()
+        public static Dictionary<RSAPaddingScheme, Type?> PaddingSchemeMap = new Dictionary<RSAPaddingScheme, Type?>()
         {
-            { SupportedRSAPaddingScheme.Textbook, null },
-            { SupportedRSAPaddingScheme.PKCS1, typeof(PKCS1Padding) },
+            { RSAPaddingScheme.Textbook, null },
+            { RSAPaddingScheme.PKCS1, typeof(PKCS1Padding) },
         };
 
-        public static IPaddingScheme? CreateInstance(SupportedRSAPaddingScheme padding)
+        public static IPaddingScheme? CreateInstance(RSAPaddingScheme padding)
         {
             Type? type = PaddingSchemeMap[padding];
             if (type == null)

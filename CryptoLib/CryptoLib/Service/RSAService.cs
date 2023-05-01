@@ -14,7 +14,7 @@ namespace CryptoLib.Service
     public class RSAService : IKeyGenerator<RSAKeyType>, IEncryptor, IDecryptor
     {
         public int KeySize { get; set; } = 1024;
-        public SupportedRSAPaddingScheme Padding { get; set; } = SupportedRSAPaddingScheme.Textbook;
+        public RSAPaddingScheme Padding { get; set; } = RSAPaddingScheme.Textbook;
 
         public async Task<Dictionary<RSAKeyType, IKey>> GenerateAsync()
         {
@@ -89,7 +89,7 @@ namespace CryptoLib.Service
                 throw new InvalidCastException();
             }
 
-            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(Padding);
+            IPaddingScheme? padding = RSAPaddingSchemeFactory.CreateInstance(Padding);
             RSAPublicKey publicKey = (RSAPublicKey)key;
             BigInteger n = publicKey.Modulus;
             BigInteger e = publicKey.PublicExponent;
@@ -126,7 +126,7 @@ namespace CryptoLib.Service
                 throw new InvalidCastException();
             }
 
-            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(Padding);
+            IPaddingScheme? padding = RSAPaddingSchemeFactory.CreateInstance(Padding);
             RSAPrivateKey privateKey = (RSAPrivateKey)key;
             BigInteger n = privateKey.Modulus;
             BigInteger d = privateKey.PrivateExponent;

@@ -16,8 +16,8 @@ namespace CryptoLib.Service
     {
         public string? Passphrase { get; set; }
         public uint Iteration { get; set; } = 4096;
-        public SupportedDESPaddingScheme Padding { get; set; } = SupportedDESPaddingScheme.PKCS5;
-        public SupportedBlockCipherMode CipherMode { get; set; } = SupportedBlockCipherMode.ECB;
+        public DESPaddingScheme Padding { get; set; } = DESPaddingScheme.PKCS5;
+        public BlockCipherMode CipherMode { get; set; } = BlockCipherMode.ECB;
         private int blockSize = 8;
 
         public byte[] DecryptBlock(byte[] data, IKey key)
@@ -36,8 +36,8 @@ namespace CryptoLib.Service
 
         public byte[] Decrypt(byte[] data, IKey key)
         {
-            IPaddingScheme padding = DESPaddingScheme.CreateInstance(Padding);
-            IBlockCipherMode mode = BlockCipherMode.CreateInstance(CipherMode);
+            IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
 
             List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
             List<byte[]> decrypted = mode.Decrypt(encrypted, key, DecryptBlock);
@@ -76,8 +76,8 @@ namespace CryptoLib.Service
 
         public byte[] Encrypt(byte[] data, IKey key)
         {
-            IPaddingScheme padding = DESPaddingScheme.CreateInstance(Padding);
-            IBlockCipherMode mode = BlockCipherMode.CreateInstance(CipherMode);
+            IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
 
             byte[] message = padding.Encode(data, key);
             List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);

@@ -36,27 +36,27 @@ namespace CryptoLib.UI.Pages
             2048, 
             4096,
         };
-        public IEnumerable<SupportedRSAPublicKeyFormat> PublicKeyFormatTypes
+        public IEnumerable<RSAPublicKeyFormat> PublicKeyFormatTypes
         {
             get
             {
-                return Enum.GetValues(typeof(SupportedRSAPublicKeyFormat)).Cast<SupportedRSAPublicKeyFormat>();
+                return Enum.GetValues(typeof(RSAPublicKeyFormat)).Cast<RSAPublicKeyFormat>();
             }
         }
 
-        public IEnumerable<SupportedRSAPrivateKeyFormat> PrivateKeyFormatTypes
+        public IEnumerable<RSAPrivateKeyFormat> PrivateKeyFormatTypes
         {
             get
             {
-                return Enum.GetValues(typeof(SupportedRSAPrivateKeyFormat)).Cast<SupportedRSAPrivateKeyFormat>();
+                return Enum.GetValues(typeof(RSAPrivateKeyFormat)).Cast<RSAPrivateKeyFormat>();
             }
         }
 
-        public IEnumerable<SupportedRSAPaddingScheme> PaddingSchemes
+        public IEnumerable<RSAPaddingScheme> PaddingSchemes
         {
             get
             {
-                return Enum.GetValues(typeof(SupportedRSAPaddingScheme)).Cast<SupportedRSAPaddingScheme>();
+                return Enum.GetValues(typeof(RSAPaddingScheme)).Cast<RSAPaddingScheme>();
             }
         }
 

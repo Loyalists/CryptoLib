@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Mode
 {
-    public enum SupportedBlockCipherMode
+    public enum BlockCipherMode
     {
         ECB,
     }
 
-    public static class BlockCipherMode
+    public static class BlockCipherModeFactory
     {
-        public static Dictionary<SupportedBlockCipherMode, Type> ModeMap = new Dictionary<SupportedBlockCipherMode, Type>()
+        public static Dictionary<BlockCipherMode, Type> ModeMap = new Dictionary<BlockCipherMode, Type>()
         {
-            { SupportedBlockCipherMode.ECB, typeof(ECBMode) },
+            { BlockCipherMode.ECB, typeof(ECBMode) },
         };
 
-        public static IBlockCipherMode CreateInstance(SupportedBlockCipherMode padding)
+        public static IBlockCipherMode CreateInstance(BlockCipherMode padding)
         {
             Type type = ModeMap[padding];
 

@@ -6,31 +6,31 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Format
 {
-    public enum SupportedRSAPublicKeyFormat
+    public enum RSAPublicKeyFormat
     {
         PKCS1,
         PKCS8,
     }
 
-    public enum SupportedRSAPrivateKeyFormat
+    public enum RSAPrivateKeyFormat
     {
         PKCS1,
     }
 
     public static class RSAKeyFormatType
     {
-        public static Dictionary<SupportedRSAPublicKeyFormat, Type> PublicKeyFormatMap = new Dictionary<SupportedRSAPublicKeyFormat, Type>()
+        public static Dictionary<RSAPublicKeyFormat, Type> PublicKeyFormatMap = new Dictionary<RSAPublicKeyFormat, Type>()
         {
-            { SupportedRSAPublicKeyFormat.PKCS1, typeof(RSAPublicKeyPKCS1) },
-            { SupportedRSAPublicKeyFormat.PKCS8, typeof(RSAPublicKeyPKCS8) },
+            { RSAPublicKeyFormat.PKCS1, typeof(RSAPublicKeyPKCS1) },
+            { RSAPublicKeyFormat.PKCS8, typeof(RSAPublicKeyPKCS8) },
         };
 
-        public static Dictionary<SupportedRSAPrivateKeyFormat, Type> PrivateKeyFormatMap = new Dictionary<SupportedRSAPrivateKeyFormat, Type>()
+        public static Dictionary<RSAPrivateKeyFormat, Type> PrivateKeyFormatMap = new Dictionary<RSAPrivateKeyFormat, Type>()
         {
-            { SupportedRSAPrivateKeyFormat.PKCS1, typeof(RSAPrivateKeyPKCS1) },
+            { RSAPrivateKeyFormat.PKCS1, typeof(RSAPrivateKeyPKCS1) },
         };
 
-        public static IKeyFormat CreatePublicKeyFormatInstance(SupportedRSAPublicKeyFormat publicKeyFormat)
+        public static IKeyFormat CreatePublicKeyFormatInstance(RSAPublicKeyFormat publicKeyFormat)
         {
             Type type = PublicKeyFormatMap[publicKeyFormat];
             IKeyFormat? instance = (IKeyFormat?)Activator.CreateInstance(type);
@@ -42,7 +42,7 @@ namespace CryptoLib.Service.Format
             return instance;
         }
 
-        public static IKeyFormat CreatePrivateKeyFormatInstance(SupportedRSAPrivateKeyFormat privateKeyFormat)
+        public static IKeyFormat CreatePrivateKeyFormatInstance(RSAPrivateKeyFormat privateKeyFormat)
         {
             Type type = PrivateKeyFormatMap[privateKeyFormat];
             IKeyFormat? instance = (IKeyFormat?)Activator.CreateInstance(type);
