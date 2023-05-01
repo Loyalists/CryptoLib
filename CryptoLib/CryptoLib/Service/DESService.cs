@@ -18,6 +18,8 @@ namespace CryptoLib.Service
         public uint Iteration { get; set; } = 4096;
         public DESPaddingScheme Padding { get; set; } = DESPaddingScheme.PKCS5;
         public BlockCipherMode CipherMode { get; set; } = BlockCipherMode.ECB;
+        private int saltSize = 8;
+        private int IVSize = 8;
         private int blockSize = 8;
 
         public byte[] DecryptBlock(byte[] data, IKey key)
@@ -28,7 +30,7 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            var encrypted = Algorithm.DES.Decrypt(data, deskey.Bytes);
+            var encrypted = Algorithm.DES.Decrypt(data, deskey.ToByteArray());
             byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
@@ -68,7 +70,7 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            var encrypted = Algorithm.DES.Encrypt(data, deskey.Bytes);
+            var encrypted = Algorithm.DES.Encrypt(data, deskey.ToByteArray());
             byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
@@ -122,7 +124,8 @@ namespace CryptoLib.Service
                 throw new ArgumentNullException();
             }
 
-            byte[] salt = MathHelper.GetRandomBytes(16);
+            byte[] salt = MathHelper.GetRandomBytes(saltSize);
+            byte[] IV = MathHelper.GetRandomBytes(IVSize);
             byte[] _key = KeyDerivation.PBKDF2(Encoding.UTF8.GetBytes(Passphrase), salt, Iteration, 7);
             BitArray ba_key = new BitArray(_key);
             List<BitArray> list = BitHelper.SplitBitsByCount(ba_key, 7);
@@ -147,7 +150,9 @@ namespace CryptoLib.Service
             }
 
             byte[] bytes = BitHelper.ConvertBitsToBytes(new BitArray(bools.ToArray()));
-            DESKey key = new DESKey(bytes, salt);
+            DESKey key = new DESKey(bytes);
+            key.Salt = salt;
+            key.IV = IV;
             var keys = new Dictionary<DESKeyType, IKey>
             {
                 { DESKeyType.Key, key }

@@ -12,12 +12,12 @@ namespace CryptoLib.Algorithm.Key
     public class DESKey : IKey
     {
         public byte[] Bytes { get; set; }
-        public byte[] Salt { get; set; }
+        public byte[]? Salt { get; set; }
+        public byte[]? IV { get; set; }
 
-        public DESKey(byte[] bytes, byte[] salt)
+        public DESKey(byte[] bytes)
         {
             Bytes = bytes;
-            Salt = salt;
         }
 
         public override string ToString()
