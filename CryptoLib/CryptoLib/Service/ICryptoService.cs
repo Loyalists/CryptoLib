@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service
 {
-    public interface IDecryptor
+    public interface ICryptoService
     {
+        byte[] Encrypt(byte[] data, IKey key);
         byte[] Decrypt(byte[] data, IKey key);
     }
 }

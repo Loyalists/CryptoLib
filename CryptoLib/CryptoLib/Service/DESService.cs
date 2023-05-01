@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service
 {
-    public class DESService : IKeyGenerator<DESKeyType>, IEncryptor, IDecryptor
+    public class DESService : IKeyGenerator<DESKeyType>, ICryptoService
     {
         public string? Passphrase { get; set; }
         public uint Iteration { get; set; } = 4096;

@@ -11,7 +11,7 @@ using CryptoLib.Utility;
 
 namespace CryptoLib.Service
 {
-    public class RSAService : IKeyGenerator<RSAKeyType>, IEncryptor, IDecryptor
+    public class RSAService : IKeyGenerator<RSAKeyType>, ICryptoService
     {
         public int KeySize { get; set; } = 1024;
         public RSAPaddingScheme Padding { get; set; } = RSAPaddingScheme.Textbook;
