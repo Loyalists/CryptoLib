@@ -99,6 +99,22 @@ namespace CryptoLib.Service
             return result;
         }
 
+        public async Task<Dictionary<DESKeyType, IKey>> GenerateAsync()
+        {
+            Dictionary<DESKeyType, IKey>? keys = null;
+            await Task.Run(() =>
+            {
+                keys = Generate();
+            });
+
+            if (keys == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return keys;
+        }
+
         public Dictionary<DESKeyType, IKey> Generate()
         {
             if (Passphrase == null)
