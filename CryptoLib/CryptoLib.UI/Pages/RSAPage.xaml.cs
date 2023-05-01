@@ -132,10 +132,9 @@ namespace CryptoLib.UI.Pages
             }
 
             var selectedPaddingScheme = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
-            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(selectedPaddingScheme);
             int keySize = publicKey.GetKeySize();
             RSAService service = new RSAService();
-            service.Padding = padding;
+            service.Padding = selectedPaddingScheme;
             service.KeySize = keySize;
             try
             {
@@ -183,10 +182,9 @@ namespace CryptoLib.UI.Pages
             }
 
             var selectedPaddingScheme = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
-            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(selectedPaddingScheme);
             int keySize = privateKey.GetKeySize();
             RSAService service = new RSAService();
-            service.Padding = padding;
+            service.Padding = selectedPaddingScheme;
             service.KeySize = keySize;
 
             try

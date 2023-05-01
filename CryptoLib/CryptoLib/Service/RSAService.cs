@@ -14,7 +14,7 @@ namespace CryptoLib.Service
     public class RSAService : IKeyGenerator<RSAKeyType>, IEncryptor, IDecryptor
     {
         public int KeySize { get; set; } = 1024;
-        public IPaddingScheme? Padding { get; set; } = null;
+        public SupportedRSAPaddingScheme Padding { get; set; } = SupportedRSAPaddingScheme.Textbook;
 
         public async Task<Dictionary<RSAKeyType, IKey>> GenerateAsync()
         {
@@ -89,14 +89,15 @@ namespace CryptoLib.Service
                 throw new InvalidCastException();
             }
 
+            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(Padding);
             RSAPublicKey publicKey = (RSAPublicKey)key;
             BigInteger n = publicKey.Modulus;
             BigInteger e = publicKey.PublicExponent;
             // OS2IP is in unsigned big endian
             byte[] padded = data;
-            if (Padding != null)
+            if (padding != null)
             {
-                padded = Padding.Encode(data, key);
+                padded = padding.Encode(data, key);
             }
 
             BigInteger encoded = new BigInteger(padded, isUnsigned: true, isBigEndian: true);
@@ -125,6 +126,7 @@ namespace CryptoLib.Service
                 throw new InvalidCastException();
             }
 
+            IPaddingScheme? padding = RSAPaddingScheme.CreateInstance(Padding);
             RSAPrivateKey privateKey = (RSAPrivateKey)key;
             BigInteger n = privateKey.Modulus;
             BigInteger d = privateKey.PrivateExponent;
@@ -136,9 +138,9 @@ namespace CryptoLib.Service
             BigInteger decrypted = RSA.Decrypt(encrypted, d, n);
             byte[] decryptedBytes = decrypted.ToByteArray(isUnsigned: true, isBigEndian: true);
             byte[] decoded = decryptedBytes;
-            if (Padding != null)
+            if (padding != null)
             {
-                decoded = Padding.Decode(decryptedBytes, key);
+                decoded = padding.Decode(decryptedBytes, key);
             }
 
             return decoded;

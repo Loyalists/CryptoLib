@@ -16,11 +16,11 @@ namespace CryptoLib.Service
     {
         public string? Passphrase { get; set; }
         public uint Iteration { get; set; } = 4096;
-        public IPaddingScheme? Padding { get; set; } = null;
-        public IBlockCipherMode? BlockCipherMode { get; set; } = null;
+        public SupportedDESPaddingScheme Padding { get; set; } = SupportedDESPaddingScheme.PKCS5;
+        public SupportedBlockCipherMode CipherMode { get; set; } = SupportedBlockCipherMode.ECB;
         private int blockSize = 8;
 
-        public byte[] Decrypt(byte[] data, IKey key)
+        public byte[] DecryptBlock(byte[] data, IKey key)
         {
             DESKey? deskey = key as DESKey;
             if (deskey == null)
@@ -28,28 +28,19 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            BitArray mainKey = new BitArray(deskey.Bytes);
             var encrypted = Algorithm.DES.Decrypt(data, deskey.Bytes);
             byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
         }
 
-        public string Decrypt(string data, IKey key)
+        public byte[] Decrypt(byte[] data, IKey key)
         {
-            if (Padding == null)
-            {
-                throw new InvalidOperationException();
-            }
+            IPaddingScheme padding = DESPaddingScheme.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherMode.CreateInstance(CipherMode);
 
-            if (BlockCipherMode == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            byte[] encrypted = Convert.FromBase64String(data);
-            List<byte[]> encryptedBlocks = Helper.SplitByCount(encrypted, blockSize);
-            List<byte[]> decrypted = BlockCipherMode.BlockDecrypt(encryptedBlocks, key);
+            List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
+            List<byte[]> decrypted = mode.Decrypt(encrypted, key, DecryptBlock);
             List<byte> bytes = new List<byte>();
             for (int i = 0; i < decrypted.Count; i++)
             {
@@ -57,12 +48,19 @@ namespace CryptoLib.Service
                 bytes.AddRange(block);
             }
 
-            byte[] decodedMessage = Padding.Decode(bytes.ToArray(), key);
-            string decoded = Encoding.UTF8.GetString(decodedMessage);
-            return decoded;
+            byte[] decodedMessage = padding.Decode(bytes.ToArray(), key);
+            return decodedMessage;
         }
 
-        public byte[] Encrypt(byte[] data, IKey key)
+        public string Decrypt(string data, IKey key)
+        {
+            byte[] encrypted = Convert.FromBase64String(data);
+            byte[] decrypted = Decrypt(encrypted, key);
+            string result = Encoding.UTF8.GetString(decrypted);
+            return result;
+        }
+
+        public byte[] EncryptBlock(byte[] data, IKey key)
         {
             DESKey? deskey = key as DESKey;
             if (deskey == null)
@@ -76,28 +74,29 @@ namespace CryptoLib.Service
             return bytes;
         }
 
-        public string Encrypt(string data, IKey key)
+        public byte[] Encrypt(byte[] data, IKey key)
         {
-            if (Padding == null)
-            {
-                throw new InvalidOperationException();
-            }
+            IPaddingScheme padding = DESPaddingScheme.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherMode.CreateInstance(CipherMode);
 
-            if (BlockCipherMode == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            byte[] message = Padding.Encode(Encoding.UTF8.GetBytes(data), key);
+            byte[] message = padding.Encode(data, key);
             List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
-            List<byte[]> encrypted = BlockCipherMode.BlockEncrypt(messageBlocks, key);
+            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, EncryptBlock);
             List<byte> bytes = new List<byte>();
             foreach (byte[] block in encrypted)
             {
                 bytes.AddRange(block);
             }
-            string encoded = Convert.ToBase64String(bytes.ToArray());
-            return encoded;
+
+            return bytes.ToArray();
+        }
+
+        public string Encrypt(string data, IKey key)
+        {
+            byte[] encoded = Encoding.UTF8.GetBytes(data);
+            byte[] encrypted = Encrypt(encoded, key);
+            string result = Convert.ToBase64String(encrypted);
+            return result;
         }
 
         public Dictionary<DESKeyType, IKey> Generate()

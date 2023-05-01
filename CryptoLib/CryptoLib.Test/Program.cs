@@ -23,7 +23,6 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             RSAService service = new RSAService();
             service.KeySize = 1024;
-            service.Padding = new PKCS1Padding();
             var publicKeyFormat = new RSAPublicKeyPKCS8();
             var privateKeyFormat = new RSAPrivateKeyPKCS1();
 
@@ -86,8 +85,6 @@ namespace CryptoLib.Test
             string message = "The quick brown fox jumps over the lazy dog";
             DESService service = new DESService();
             service.Passphrase = passphrase;
-            service.Padding = new PKCS5Padding();
-            service.BlockCipherMode = new ECBMode(service);
             var keys = service.Generate();
             DESKey key = (DESKey)keys[DESKeyType.Key];
             Console.WriteLine("key:");

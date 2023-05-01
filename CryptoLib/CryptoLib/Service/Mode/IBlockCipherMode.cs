@@ -9,7 +9,7 @@ namespace CryptoLib.Service.Mode
 {
     public interface IBlockCipherMode
     {
-        List<byte[]> BlockEncrypt(List<byte[]> blocks, IKey key);
-        List<byte[]> BlockDecrypt(List<byte[]> blocks, IKey key);
+        List<byte[]> Encrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> func);
+        List<byte[]> Decrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> func);
     }
 }

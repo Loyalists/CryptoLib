@@ -9,43 +9,25 @@ namespace CryptoLib.Service.Mode
 {
     public class ECBMode : IBlockCipherMode
     {
-        public object Service { get; set; }
-        public ECBMode(object service)
+        public List<byte[]> Decrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> encryptFunc)
         {
-            Service = service;
-        }
-
-        public List<byte[]> BlockDecrypt(List<byte[]> blocks, IKey key)
-        {
-            IDecryptor? decryptor = Service as IDecryptor;
-            if (decryptor == null)
-            {
-                throw new InvalidOperationException();
-            }
-
             List<byte[]> decryptedBlocks = new List<byte[]>(blocks.Count);
             for (int i = 0; i < blocks.Count; i++)
             {
-                byte[] block = decryptor.Decrypt(blocks[i], key);
+                byte[] block = encryptFunc(blocks[i], key);
                 decryptedBlocks.Add(block);
             }
 
             return decryptedBlocks;
         }
 
-        public List<byte[]> BlockEncrypt(List<byte[]> blocks, IKey key)
+        public List<byte[]> Encrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> decryptFunc)
         {
-            IEncryptor? encryptor = Service as IEncryptor;
-            if (encryptor == null) 
-            {
-                throw new InvalidOperationException();
-            }
-
             List<byte[]> encryptedBlocks = new List<byte[]>(blocks.Count);
 
             for (int i = 0; i < blocks.Count; i++)
             {
-                byte[] block = encryptor.Encrypt(blocks[i], key);
+                byte[] block = decryptFunc(blocks[i], key);
                 encryptedBlocks.Add(block);
             }
 
