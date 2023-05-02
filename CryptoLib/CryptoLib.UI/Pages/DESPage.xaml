@@ -6,36 +6,89 @@
       xmlns:local="clr-namespace:CryptoLib.UI.Pages"
       xmlns:ui="http://schemas.modernwpf.com/2019"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:util="clr-namespace:CryptoLib.UI.Utility"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="DESPage">
+      d:DesignHeight="810" d:DesignWidth="1440"
+      Title="RSAPage"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <ScrollViewer>
-        <Grid Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
-            <Grid.Resources>
-                <sys:Double x:Key="TileHeight">150</sys:Double>
-            </Grid.Resources>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <ui:SimpleStackPanel Margin="12" Spacing="12">
+            <TextBlock Text="DES" Style="{StaticResource HeaderTextBlockStyle}" />
+            <Grid>
+                <ui:SimpleStackPanel>
+                    <TextBlock TextWrapping="Wrap" Text="Key Manager/Generator" FontSize="16" FontWeight="Light"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" MinWidth="200"/>
+                        </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="1" Grid.Column="1" MinHeight="{StaticResource TileHeight}" Background="DarkGray" Margin="6" />
-            <Grid Grid.Row="1" Grid.Column="2" MinHeight="{StaticResource TileHeight}" Background="LightGray" Margin="6" />
-            <Grid Grid.Row="2" Grid.Column="1" MinHeight="{StaticResource TileHeight}" Background="LightGray" Margin="6" />
-            <Grid Grid.Row="2" Grid.Column="2" MinHeight="{StaticResource TileHeight}" Background="DarkGray" Margin="6" />
-            <Grid x:Name="SourceElement" Grid.Row="1" Grid.Column="0" MinHeight="{StaticResource TileHeight}" Background="{DynamicResource SystemControlBackgroundAccentBrush}" Margin="5" Grid.RowSpan="2" MinWidth="250" />
+                        <Grid Grid.Column="0">
+                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                <TextBox x:Name="PassphraseTextBox" TextWrapping="Wrap" Text="" MinHeight="160" ui:ControlHelper.Header="Passphrase"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>                        
+                        
+                        <Grid Grid.Column="1">
+                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                <TextBox x:Name="KeyTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Key"/>
+                                <TextBox x:Name="SaltTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt"/>
+                                <TextBox x:Name="IVTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="IV"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
 
-            <Grid Grid.Row="3" Grid.ColumnSpan="3" Margin="6,12">
-                <TextBlock TextWrapping="Wrap" Style="{DynamicResource BodyTextBlockStyle}" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
+                        <Grid Grid.Column="2">
+                            <Grid.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                            </Grid.Background>
+                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                <ComboBox x:Name="KeyFormatComboBox" ui:ControlHelper.Header="Key Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=KeyFormats}"/>
+                                <Button x:Name="GenerateButton" Content="Generate" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateButton_Click"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Text="Encryption/Decryption" FontSize="16" FontWeight="Light"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <ui:SimpleStackPanel>
+                                <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                    <TextBox x:Name="PlainTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Plain Text" AcceptsReturn="True"/>
+                                </ui:SimpleStackPanel>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <Grid.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                            </Grid.Background>
+                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                <ComboBox x:Name="PaddingSchemeComboBox" ui:ControlHelper.Header="Padding Scheme" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=PaddingSchemes}"/>
+                                <ComboBox x:Name="ModeComboBox" ui:ControlHelper.Header="Mode" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=Modes}"/>
+                                <ComboBox x:Name="TextFormatComboBox" ui:ControlHelper.Header="Text Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=TextFormats}"/>
+                                <Button x:Name="EncryptButton" Content="Encrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptButton_Click"/>
+                                <Button x:Name="DecryptButton" Content="Decrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptButton_Click"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="2">
+                            <ui:SimpleStackPanel>
+                                <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Cipher Text" AcceptsReturn="True"/>
+                                </ui:SimpleStackPanel>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+                    </Grid>
+
+                </ui:SimpleStackPanel>
             </Grid>
-        </Grid>
+        </ui:SimpleStackPanel>
     </ScrollViewer>
 </ui:Page>

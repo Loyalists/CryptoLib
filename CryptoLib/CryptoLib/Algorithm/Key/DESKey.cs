@@ -26,7 +26,7 @@ namespace CryptoLib.Algorithm.Key
             return keyString;
         }
 
-        public string ToString(IKeyFormat? keyFormat = null, bool isFormatted = true)
+        public string ToString(IKeyFormat? keyFormat, bool isFormatted = true)
         {
             return ToString();
         }

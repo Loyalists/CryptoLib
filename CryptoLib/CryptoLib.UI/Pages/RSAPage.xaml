@@ -74,7 +74,7 @@
                         <Grid Grid.Column="2">
                             <ui:SimpleStackPanel>
                                 <ui:SimpleStackPanel  Margin="12" Spacing="12">
-                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Encrypted Text" AcceptsReturn="True"/>
+                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Cipher Text" AcceptsReturn="True"/>
                                 </ui:SimpleStackPanel>
                             </ui:SimpleStackPanel>
                         </Grid>
