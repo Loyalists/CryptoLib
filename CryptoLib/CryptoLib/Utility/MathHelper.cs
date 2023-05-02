@@ -12,7 +12,7 @@ namespace CryptoLib.Utility
     public static class MathHelper
     {
         // https://stackoverflow.com/questions/20802857/xor-function-for-two-hex-byte-arrays
-        public static byte[] XORBytes(byte[] key, byte[] PAN)
+        public static byte[] XORBytes(this byte[] key, byte[] PAN)
         {
             if (key.Length != PAN.Length)
             {

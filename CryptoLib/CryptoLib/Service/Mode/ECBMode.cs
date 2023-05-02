@@ -9,7 +9,7 @@ namespace CryptoLib.Service.Mode
 {
     public class ECBMode : IBlockCipherMode
     {
-        public List<byte[]> Decrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> encryptFunc)
+        public List<byte[]> Decrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> encryptFunc, IDictionary<string, object>? properties = null)
         {
             List<byte[]> decryptedBlocks = new List<byte[]>(blocks.Count);
             for (int i = 0; i < blocks.Count; i++)
@@ -21,7 +21,7 @@ namespace CryptoLib.Service.Mode
             return decryptedBlocks;
         }
 
-        public List<byte[]> Encrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> decryptFunc)
+        public List<byte[]> Encrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> decryptFunc, IDictionary<string, object>? properties = null)
         {
             List<byte[]> encryptedBlocks = new List<byte[]>(blocks.Count);
 

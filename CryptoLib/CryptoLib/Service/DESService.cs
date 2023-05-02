@@ -38,11 +38,26 @@ namespace CryptoLib.Service
 
         public byte[] Decrypt(byte[] data, IKey key)
         {
+            DESKey? deskey = key as DESKey;
+            if (deskey == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (deskey.IV == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
+            Dictionary<string, object> param = new Dictionary<string, object>()
+            {
+                { "IV", deskey.IV },
+            };
 
             List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
-            List<byte[]> decrypted = mode.Decrypt(encrypted, key, DecryptBlock);
+            List<byte[]> decrypted = mode.Decrypt(encrypted, key, DecryptBlock, param);
             List<byte> bytes = new List<byte>();
             for (int i = 0; i < decrypted.Count; i++)
             {
@@ -78,12 +93,27 @@ namespace CryptoLib.Service
 
         public byte[] Encrypt(byte[] data, IKey key)
         {
+            DESKey? deskey = key as DESKey;
+            if (deskey == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (deskey.IV == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
+            Dictionary<string, object> param = new Dictionary<string, object>()
+            {
+                { "IV", deskey.IV },
+            };
 
             byte[] message = padding.Encode(data, key);
             List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
-            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, EncryptBlock);
+            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, EncryptBlock, param);
             List<byte> bytes = new List<byte>();
             foreach (byte[] block in encrypted)
             {

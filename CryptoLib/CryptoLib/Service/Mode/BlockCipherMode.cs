@@ -10,6 +10,7 @@ namespace CryptoLib.Service.Mode
     public enum BlockCipherMode
     {
         ECB,
+        CBC,
     }
 
     public static class BlockCipherModeFactory
@@ -17,6 +18,7 @@ namespace CryptoLib.Service.Mode
         public static Dictionary<BlockCipherMode, Type> ModeMap = new Dictionary<BlockCipherMode, Type>()
         {
             { BlockCipherMode.ECB, typeof(ECBMode) },
+            { BlockCipherMode.CBC, typeof(CBCMode) },
         };
 
         public static IBlockCipherMode CreateInstance(BlockCipherMode padding)
