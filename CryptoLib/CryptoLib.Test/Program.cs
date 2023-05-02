@@ -46,6 +46,8 @@ namespace CryptoLib.Test
             Console.WriteLine($"q:{privateKey.Prime2}");
             Console.WriteLine();
 
+            Console.WriteLine($"padding:{Enum.GetName(typeof(RSAPaddingScheme), service.Padding)}");
+
             string plainText = "The quick brown fox jumps over the lazy dog";
             Console.WriteLine("plainText:");
             Console.WriteLine(plainText);
@@ -87,6 +89,7 @@ namespace CryptoLib.Test
             service.Passphrase = passphrase;
             //service.Padding = DESPaddingScheme.None;
             service.CipherMode = BlockCipherMode.CFB;
+            Console.WriteLine($"padding:{Enum.GetName(typeof(DESPaddingScheme), service.Padding)}");
             Console.WriteLine($"mode:{Enum.GetName(typeof(BlockCipherMode), service.CipherMode)}");
 
             var keys = service.Generate();

@@ -43,6 +43,12 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
+            var func = DecryptBlock;
+            if (CipherMode == BlockCipherMode.CFB)
+            {
+                func = EncryptBlock;
+            }
+
             IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             Dictionary<string, object> param = new Dictionary<string, object>()
@@ -51,15 +57,7 @@ namespace CryptoLib.Service
             };
 
             List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
-            List<byte[]> decrypted;
-            if (CipherMode == BlockCipherMode.CFB)
-            {
-                decrypted = mode.Decrypt(encrypted, key, EncryptBlock, param);
-            }
-            else
-            {
-                decrypted = mode.Decrypt(encrypted, key, DecryptBlock, param);
-            }
+            List<byte[]> decrypted = mode.Decrypt(encrypted, key, func, param);
 
             List<byte> bytes = new List<byte>();
             for (int i = 0; i < decrypted.Count; i++)
@@ -111,6 +109,7 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
+            var func = EncryptBlock;
             IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             Dictionary<string, object> param = new Dictionary<string, object>()
@@ -125,7 +124,7 @@ namespace CryptoLib.Service
             }
 
             List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
-            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, EncryptBlock, param);
+            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, func, param);
             List<byte> bytes = new List<byte>();
             foreach (byte[] block in encrypted)
             {
