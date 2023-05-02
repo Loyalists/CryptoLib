@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Mode
 {
-    public class CBCMode : IBlockCipherMode
+    public class CFBMode : IBlockCipherMode
     {
         public List<byte[]> Encrypt(List<byte[]> blocks, IKey key, Func<byte[], IKey, byte[]> encryptFunc, IDictionary<string, object>? properties = null)
         {
@@ -18,16 +18,16 @@ namespace CryptoLib.Service.Mode
             }
 
             byte[] IV = (byte[])properties["IV"];
-            byte[] to_be_xored = IV;
+            byte[] input = IV;
             List<byte[]> encryptedBlocks = new List<byte[]>(blocks.Count);
 
             for (int i = 0; i < blocks.Count; i++)
             {
                 byte[] text = blocks[i];
-                byte[] xor = text.XORBytes(to_be_xored);
-                byte[] encrypted = encryptFunc(xor, key);
-                to_be_xored = encrypted;
-                encryptedBlocks.Add(encrypted);
+                byte[] encrypted = encryptFunc(input, key);
+                byte[] xor = text.XORBytes(encrypted);
+                input = xor;
+                encryptedBlocks.Add(xor);
             }
 
             return encryptedBlocks;
@@ -41,15 +41,15 @@ namespace CryptoLib.Service.Mode
             }
 
             byte[] IV = (byte[])properties["IV"];
-            byte[] to_be_xored = IV;
+            byte[] input = IV;
             List<byte[]> decryptedBlocks = new List<byte[]>(blocks.Count);
 
             for (int i = 0; i < blocks.Count; i++)
             {
                 byte[] text = blocks[i];
-                byte[] decrypted = decryptFunc(text, key);
-                byte[] xor = decrypted.XORBytes(to_be_xored);
-                to_be_xored = text;
+                byte[] decrypted = decryptFunc(input, key);
+                byte[] xor = text.XORBytes(decrypted);
+                input = text;
                 decryptedBlocks.Add(xor);
             }
 

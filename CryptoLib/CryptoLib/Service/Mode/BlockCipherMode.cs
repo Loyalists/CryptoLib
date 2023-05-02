@@ -11,6 +11,7 @@ namespace CryptoLib.Service.Mode
     {
         ECB,
         CBC,
+        CFB,
     }
 
     public static class BlockCipherModeFactory
@@ -19,6 +20,7 @@ namespace CryptoLib.Service.Mode
         {
             { BlockCipherMode.ECB, typeof(ECBMode) },
             { BlockCipherMode.CBC, typeof(CBCMode) },
+            { BlockCipherMode.CFB, typeof(CFBMode) },
         };
 
         public static IBlockCipherMode CreateInstance(BlockCipherMode padding)

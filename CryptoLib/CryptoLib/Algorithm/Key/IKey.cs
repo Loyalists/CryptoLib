@@ -9,7 +9,7 @@ namespace CryptoLib.Algorithm.Key
 {
     public interface IKey
     {
-        string ToString(IKeyFormat? keyFormat, bool isFormatted);
-        byte[] ToByteArray(IKeyFormat? keyFormat);
+        string ToString(IKeyFormat? keyFormat = null, bool isFormatted = true);
+        byte[] ToByteArray(IKeyFormat? keyFormat = null);
     }
 }

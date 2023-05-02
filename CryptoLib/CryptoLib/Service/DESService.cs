@@ -24,13 +24,7 @@ namespace CryptoLib.Service
 
         public byte[] DecryptBlock(byte[] data, IKey key)
         {
-            DESKey? deskey = key as DESKey;
-            if (deskey == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var encrypted = Algorithm.DES.Decrypt(data, deskey.ToByteArray());
+            var encrypted = Algorithm.DES.Decrypt(data, key.ToByteArray());
             byte[] bytes = new byte[blockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
@@ -49,7 +43,7 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             Dictionary<string, object> param = new Dictionary<string, object>()
             {
@@ -57,16 +51,29 @@ namespace CryptoLib.Service
             };
 
             List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
-            List<byte[]> decrypted = mode.Decrypt(encrypted, key, DecryptBlock, param);
+            List<byte[]> decrypted;
+            if (CipherMode == BlockCipherMode.CFB)
+            {
+                decrypted = mode.Decrypt(encrypted, key, EncryptBlock, param);
+            }
+            else
+            {
+                decrypted = mode.Decrypt(encrypted, key, DecryptBlock, param);
+            }
+
             List<byte> bytes = new List<byte>();
             for (int i = 0; i < decrypted.Count; i++)
             {
                 byte[] block = decrypted[i];
                 bytes.AddRange(block);
             }
+            byte[] result = bytes.ToArray();
+            if (padding != null)
+            {
+                result = padding.Decode(result, key);
+            }
 
-            byte[] decodedMessage = padding.Decode(bytes.ToArray(), key);
-            return decodedMessage;
+            return result;
         }
 
         public string Decrypt(string data, IKey key)
@@ -104,14 +111,19 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            IPaddingScheme padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             Dictionary<string, object> param = new Dictionary<string, object>()
             {
                 { "IV", deskey.IV },
             };
 
-            byte[] message = padding.Encode(data, key);
+            byte[] message = data;
+            if (padding != null)
+            {
+                message = padding.Encode(data, key);
+            }
+
             List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
             List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, EncryptBlock, param);
             List<byte> bytes = new List<byte>();

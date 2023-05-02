@@ -85,10 +85,15 @@ namespace CryptoLib.Test
             string message = "The quick brown fox jumps over the lazy dog";
             DESService service = new DESService();
             service.Passphrase = passphrase;
+            //service.Padding = DESPaddingScheme.None;
+            service.CipherMode = BlockCipherMode.CFB;
+            Console.WriteLine($"mode:{Enum.GetName(typeof(BlockCipherMode), service.CipherMode)}");
+
             var keys = service.Generate();
             DESKey key = (DESKey)keys[DESKeyType.Key];
-            Console.WriteLine("key:");
-            Console.WriteLine(key);
+            Console.WriteLine($"key:{key}");
+            Console.WriteLine($"salt:{Convert.ToHexString(key.Salt)}");
+            Console.WriteLine($"IV:{Convert.ToHexString(key.IV)}");
             Console.WriteLine("message:");
             Console.WriteLine(message);
 
