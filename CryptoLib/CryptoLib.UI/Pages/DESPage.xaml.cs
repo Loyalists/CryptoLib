@@ -3,6 +3,7 @@ using CryptoLib.Service;
 using CryptoLib.Service.Format;
 using CryptoLib.Service.Mode;
 using CryptoLib.Service.Padding;
+using CryptoLib.UI.Utility;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
@@ -70,12 +71,7 @@ namespace CryptoLib.UI.Pages
             string passphrase = PassphraseTextBox.Text;
             if (string.IsNullOrEmpty(passphrase))
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = "To generate a DES key, fill in the Passphrase textbox first.",
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog("To generate a DES key, fill in the Passphrase textbox first.");
                 return;
             }
 
@@ -103,23 +99,18 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
-        private async void EncryptButton_Click(object sender, RoutedEventArgs e)
+        private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string plainText = PlainTextBox.Text;
-            //if (string.IsNullOrEmpty(plainText))
-            //{
-            //    return;
-            //}
+            if (string.IsNullOrEmpty(plainText))
+            {
+                return;
+            }
 
             var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
             var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
@@ -128,12 +119,7 @@ namespace CryptoLib.UI.Pages
             {
                 if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
                 {
-                    ContentDialog dialog = new ContentDialog
-                    {
-                        Content = "ECB and CBC cipher mode require a valid padding scheme to function!",
-                        CloseButtonText = "Ok"
-                    };
-                    await dialog.ShowAsync();
+                    UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
                     return;
                 }
             }
@@ -156,19 +142,52 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
+            string encryptedText = EncryptedTextBox.Text;
+            if (string.IsNullOrEmpty(encryptedText))
+            {
+                return;
+            }
 
+            var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
+            var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
+
+            if (selectedPadding == DESPaddingScheme.None)
+            {
+                if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
+                {
+                    UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
+                    return;
+                }
+            }
+
+            try
+            {
+                DESService service = new DESService();
+                service.CipherMode = selectedMode;
+                service.Padding = selectedPadding;
+
+                byte[] bytes = Convert.FromHexString(KeyTextBox.Text);
+                byte[] salt = Convert.FromHexString(SaltTextBox.Text);
+                byte[] iv = Convert.FromHexString(IVTextBox.Text);
+                var key = new DESKey(bytes);
+                key.Salt = salt;
+                key.IV = iv;
+
+                string decryptedText = service.Decrypt(encryptedText, key);
+                PlainTextBox.Text = decryptedText;
+            }
+            catch (Exception ex)
+            {
+                UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
         }
     }
 }

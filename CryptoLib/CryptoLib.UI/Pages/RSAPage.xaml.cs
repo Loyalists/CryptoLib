@@ -2,6 +2,7 @@
 using CryptoLib.Service;
 using CryptoLib.Service.Format;
 using CryptoLib.Service.Padding;
+using CryptoLib.UI.Utility;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
@@ -103,7 +104,7 @@ namespace CryptoLib.UI.Pages
             PrivateKeyTextBox.Text = privateKey.ToString(privateKeyFormat, formatted);
         }
 
-        private async void EncryptButton_Click(object sender, RoutedEventArgs e)
+        private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string plainText = PlainTextBox.Text;
             if (string.IsNullOrEmpty(plainText))
@@ -122,12 +123,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex) 
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
 
@@ -143,17 +139,12 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
-        private async void DecryptButton_Click(object sender, RoutedEventArgs e)
+        private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string encryptedText = EncryptedTextBox.Text;
             if (string.IsNullOrEmpty(encryptedText))
@@ -172,12 +163,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
 
@@ -194,12 +180,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                ContentDialog dialog = new ContentDialog
-                {
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-                await dialog.ShowAsync();
+                UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
