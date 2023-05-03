@@ -129,13 +129,7 @@ namespace CryptoLib.UI.Pages
                 DESService service = new DESService();
                 service.CipherMode = selectedMode;
                 service.Padding = selectedPadding;
-
-                byte[] bytes = Convert.FromHexString(KeyTextBox.Text);
-                byte[] salt = Convert.FromHexString(SaltTextBox.Text);
-                byte[] iv = Convert.FromHexString(IVTextBox.Text);
-                var key = new DESKey(bytes);
-                key.Salt = salt;
-                key.IV = iv;
+                DESKey key = GetKey();
 
                 string encryptedText = service.Encrypt(plainText, key);
                 EncryptedTextBox.Text = encryptedText;
@@ -172,13 +166,7 @@ namespace CryptoLib.UI.Pages
                 DESService service = new DESService();
                 service.CipherMode = selectedMode;
                 service.Padding = selectedPadding;
-
-                byte[] bytes = Convert.FromHexString(KeyTextBox.Text);
-                byte[] salt = Convert.FromHexString(SaltTextBox.Text);
-                byte[] iv = Convert.FromHexString(IVTextBox.Text);
-                var key = new DESKey(bytes);
-                key.Salt = salt;
-                key.IV = iv;
+                DESKey key = GetKey();
 
                 string decryptedText = service.Decrypt(encryptedText, key);
                 PlainTextBox.Text = decryptedText;
@@ -188,6 +176,18 @@ namespace CryptoLib.UI.Pages
                 await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
+        }
+
+        private DESKey GetKey()
+        {
+            byte[] bytes = Convert.FromHexString(KeyTextBox.Text);
+            byte[] salt = Convert.FromHexString(SaltTextBox.Text);
+            byte[] iv = Convert.FromHexString(IVTextBox.Text);
+            var key = new DESKey(bytes);
+            key.Salt = salt;
+            key.IV = iv;
+
+            return key;
         }
     }
 }
