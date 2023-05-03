@@ -71,7 +71,7 @@ namespace CryptoLib.UI.Pages
             string passphrase = PassphraseTextBox.Text;
             if (string.IsNullOrEmpty(passphrase))
             {
-                UIHelper.ShowSimpleDialog("To generate a DES key, fill in the Passphrase textbox first.");
+                await UIHelper.ShowSimpleDialog("To generate a DES key, fill in the Passphrase textbox first.");
                 return;
             }
 
@@ -99,12 +99,12 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
-        private void EncryptButton_Click(object sender, RoutedEventArgs e)
+        private async void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string plainText = PlainTextBox.Text;
             if (string.IsNullOrEmpty(plainText))
@@ -119,7 +119,7 @@ namespace CryptoLib.UI.Pages
             {
                 if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
                 {
-                    UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
+                    await UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
                     return;
                 }
             }
@@ -142,12 +142,12 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
-        private void DecryptButton_Click(object sender, RoutedEventArgs e)
+        private async void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string encryptedText = EncryptedTextBox.Text;
             if (string.IsNullOrEmpty(encryptedText))
@@ -162,7 +162,7 @@ namespace CryptoLib.UI.Pages
             {
                 if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
                 {
-                    UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
+                    await UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
                     return;
                 }
             }
@@ -185,7 +185,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }

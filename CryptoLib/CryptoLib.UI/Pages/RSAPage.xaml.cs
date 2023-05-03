@@ -104,7 +104,7 @@ namespace CryptoLib.UI.Pages
             PrivateKeyTextBox.Text = privateKey.ToString(privateKeyFormat, formatted);
         }
 
-        private void EncryptButton_Click(object sender, RoutedEventArgs e)
+        private async void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string plainText = PlainTextBox.Text;
             if (string.IsNullOrEmpty(plainText))
@@ -123,7 +123,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex) 
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
 
@@ -139,12 +139,12 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }
 
-        private void DecryptButton_Click(object sender, RoutedEventArgs e)
+        private async void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string encryptedText = EncryptedTextBox.Text;
             if (string.IsNullOrEmpty(encryptedText))
@@ -163,7 +163,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace CryptoLib.UI.Pages
             }
             catch (Exception ex)
             {
-                UIHelper.ShowSimpleDialog(ex.ToString());
+                await UIHelper.ShowSimpleDialog(ex.ToString());
                 return;
             }
         }

@@ -9,7 +9,7 @@ namespace CryptoLib.UI.Utility
 {
     public static class UIHelper
     {
-        public static async void ShowSimpleDialog(string message)
+        public static async Task ShowSimpleDialog(string message)
         {
             ContentDialog dialog = new ContentDialog
             {
