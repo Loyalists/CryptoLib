@@ -30,7 +30,6 @@ namespace CryptoLib.Test
             var keys = service.Generate();
             double time_key = sw.Elapsed.TotalSeconds;
 
-
             var publicKey = (RSAPublicKey)keys[RSAKeyType.PublicKey];
             var privateKey = (RSAPrivateKey)keys[RSAKeyType.PrivateKey];
             Console.WriteLine("publicKey:");
@@ -73,7 +72,7 @@ namespace CryptoLib.Test
                 Console.WriteLine("RSA implementation is NOT valid.");
             }
             Console.WriteLine();
-            Console.WriteLine($"time elapsed for generating RSA key pair:{time_key}");
+            Console.WriteLine($"time elapsed for generating a RSA key pair:{time_key}");
             Console.WriteLine($"time elapsed for encryption:{time_enc}");
             Console.WriteLine($"time elapsed for decryption:{time_dec}");
             sw.Stop();
@@ -120,10 +119,41 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
+        static void TestGenerateRSAKey()
+        {
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
+            int count = 10;
+            int keySize = 1024;
+            double totalTime = 0;
+            Console.WriteLine($"key size:{keySize}");
+            var tasks = new List<Task>();
+            for (int i = 0; i < count; i++)
+            {
+                var task = Task.Factory.StartNew(() =>
+                {
+                    RSAService service = new RSAService();
+                    service.KeySize = keySize;
+                    var sw = Stopwatch.StartNew();
+                    service.Generate();
+                    sw.Stop();
+                    double time = sw.Elapsed.TotalSeconds;
+                    totalTime += time;
+                    Console.WriteLine($"time elapsed for generating a RSA key pair:{time}");
+                });
+                tasks.Add(task);
+            }
+            Task t = Task.WhenAll(tasks);
+            t.Wait();
+            Console.WriteLine($"average:{totalTime / count} secs");
+
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
+        }
+
         static void Main(string[] args)
         {
             //TestRSA();
-            TestDES();
+            TestGenerateRSAKey();
+            //TestDES();
         }
     }
 }
