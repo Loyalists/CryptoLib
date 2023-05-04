@@ -17,7 +17,14 @@ namespace CryptoLib.UI.Utility
                 CloseButtonText = "Ok"
             };
 
-            await dialog.ShowAsync();
+            try
+            {
+                await dialog.ShowAsync();
+            }
+            catch (Exception)
+            {
+
+            }
         }
     }
 }

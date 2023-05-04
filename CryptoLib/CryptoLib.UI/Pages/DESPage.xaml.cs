@@ -75,6 +75,7 @@ namespace CryptoLib.UI.Pages
                 return;
             }
 
+            var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
             try
             {
                 DESService service = new DESService();
@@ -93,9 +94,18 @@ namespace CryptoLib.UI.Pages
                     throw new Exception();
                 }
 
-                KeyTextBox.Text = key.ToString(null);
-                SaltTextBox.Text = Convert.ToHexString(key.Salt);
-                IVTextBox.Text = Convert.ToHexString(key.IV);
+                if (selectedKeyFormat == "Hex")
+                {
+                    KeyTextBox.Text = key.ToString(null);
+                    SaltTextBox.Text = Convert.ToHexString(key.Salt);
+                    IVTextBox.Text = Convert.ToHexString(key.IV);
+                }
+                else
+                {
+                    KeyTextBox.Text = Convert.ToBase64String(key.Bytes);
+                    SaltTextBox.Text = Convert.ToBase64String(key.Salt);
+                    IVTextBox.Text = Convert.ToBase64String(key.IV);
+                }
             }
             catch (Exception ex)
             {
@@ -114,6 +124,7 @@ namespace CryptoLib.UI.Pages
 
             var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
             var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
+            var selectedTextFormat = TextFormats.ElementAt(TextFormatComboBox.SelectedIndex);
 
             if (selectedPadding == DESPaddingScheme.None)
             {
@@ -132,7 +143,13 @@ namespace CryptoLib.UI.Pages
                 DESKey key = GetKey();
 
                 string encryptedText = service.Encrypt(plainText, key);
-                EncryptedTextBox.Text = encryptedText;
+                string converted = encryptedText;
+                if (selectedTextFormat == "Hex")
+                {
+                    byte[] bytes = Convert.FromBase64String(encryptedText);
+                    converted = Convert.ToHexString(bytes);
+                }
+                EncryptedTextBox.Text = converted;
             }
             catch (Exception ex)
             {
@@ -151,6 +168,7 @@ namespace CryptoLib.UI.Pages
 
             var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
             var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
+            var selectedTextFormat = TextFormats.ElementAt(TextFormatComboBox.SelectedIndex);
 
             if (selectedPadding == DESPaddingScheme.None)
             {
@@ -168,7 +186,13 @@ namespace CryptoLib.UI.Pages
                 service.Padding = selectedPadding;
                 DESKey key = GetKey();
 
-                string decryptedText = service.Decrypt(encryptedText, key);
+                string converted = encryptedText;
+                if (selectedTextFormat == "Hex")
+                {
+                    byte[] bytes = Convert.FromHexString(converted);
+                    converted = Convert.ToBase64String(bytes);
+                }
+                string decryptedText = service.Decrypt(converted, key);
                 PlainTextBox.Text = decryptedText;
             }
             catch (Exception ex)
@@ -180,9 +204,23 @@ namespace CryptoLib.UI.Pages
 
         private DESKey GetKey()
         {
-            byte[] bytes = Convert.FromHexString(KeyTextBox.Text);
-            byte[] salt = Convert.FromHexString(SaltTextBox.Text);
-            byte[] iv = Convert.FromHexString(IVTextBox.Text);
+            var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
+            byte[] bytes;
+            byte[] salt;
+            byte[] iv;
+            if (selectedKeyFormat == "Hex")
+            {
+                bytes = Convert.FromHexString(KeyTextBox.Text);
+                salt = Convert.FromHexString(SaltTextBox.Text);
+                iv = Convert.FromHexString(IVTextBox.Text);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(KeyTextBox.Text);
+                salt = Convert.FromBase64String(SaltTextBox.Text);
+                iv = Convert.FromBase64String(IVTextBox.Text);
+            }
+
             var key = new DESKey(bytes);
             key.Salt = salt;
             key.IV = iv;
