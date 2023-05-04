@@ -119,7 +119,7 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
-        static void TestGenerateRSAKey()
+        static void TestRSAGenerateKey()
         {
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             int count = 10;
@@ -152,7 +152,7 @@ namespace CryptoLib.Test
         static void Main(string[] args)
         {
             //TestRSA();
-            TestGenerateRSAKey();
+            TestRSAGenerateKey();
             //TestDES();
         }
     }
