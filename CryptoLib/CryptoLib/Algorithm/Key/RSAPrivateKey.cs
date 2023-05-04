@@ -56,8 +56,8 @@ namespace CryptoLib.Algorithm.Key
 
         public int GetKeySize()
         {
-            return Modulus.GetByteCount(true) * 8;
-            //return (int)Modulus.GetBitLength();
+            //return Modulus.GetByteCount(true) * 8;
+            return (int)Modulus.GetBitLength();
         }
     }
 }

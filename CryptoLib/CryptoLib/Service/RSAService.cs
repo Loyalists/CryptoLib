@@ -35,24 +35,35 @@ namespace CryptoLib.Service
         public Dictionary<RSAKeyType, IKey> Generate()
         {
             int numSize = KeySize / 2;
-            var tasks = new List<Task>();
             BigInteger p = BigInteger.One;
             BigInteger q = BigInteger.One;
-            tasks.Add(Task.Factory.StartNew(() =>
+            while (true)
             {
-                p = MathHelper.GetRandomPrime(numSize);
-            }));
-            tasks.Add(Task.Factory.StartNew(() =>
-            {
-                q = MathHelper.GetRandomPrime(numSize);
-            }));
-            Task t = Task.WhenAll(tasks);
-            try
-            {
-                t.Wait();
+                var tasks = new List<Task>
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        p = MathHelper.GetRandomPrime(numSize);
+                    }),
+                    Task.Factory.StartNew(() =>
+                    {
+                        q = MathHelper.GetRandomPrime(numSize);
+                    })
+                };
+                Task t = Task.WhenAll(tasks);
+                try
+                {
+                    t.Wait();
+                }
+                catch { }
+
+                BigInteger _n = Algorithm.RSA.GetModulus(p, q);
+                if (_n.GetBitLength() == KeySize)
+                {
+                    break;
+                }
             }
-            catch { }
-            tasks.Clear();
+
 
             BigInteger n = Algorithm.RSA.GetModulus(p, q);
             BigInteger lambda = Algorithm.RSA.GetLambda(p, q);
