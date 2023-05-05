@@ -13,7 +13,8 @@ namespace CryptoLib.Algorithm
         // https://datatracker.ietf.org/doc/html/rfc2898#section-5.2
         public static byte[] PBKDF2(byte[] password, byte[] salt, uint iteration, uint keyLength)
         {
-            uint hLen = HMACSHA256.HashSizeInBytes;
+            //uint hLen = HMACSHA256.HashSizeInBytes;
+            uint hLen = 32;
             uint l = (uint)Math.Ceiling((float)keyLength / hLen);
             uint r = keyLength - (l - 1) * hLen;
             List<byte> bytes = new List<byte>();
