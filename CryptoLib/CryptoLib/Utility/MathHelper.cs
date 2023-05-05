@@ -55,7 +55,7 @@ namespace CryptoLib.Utility
             byte[] bytes = new byte[bitSize / 8];
             rng.GetBytes(bytes);
 
-            BigInteger p = new BigInteger(bytes);
+            BigInteger p = new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
             BigInteger bitwise = BigInteger.Pow(new BigInteger(2), bitSize - 1) + 1;
             p = p | bitwise;
             return p;
@@ -73,12 +73,6 @@ namespace CryptoLib.Utility
                 }
 
                 num = Randomize(n);
-
-                if (num < 0)
-                {
-                    continue;
-                }
-
                 test = RabinMiller.IsPrime(num, 2);
             }
             return num;

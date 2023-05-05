@@ -126,6 +126,7 @@ namespace CryptoLib.Test
             int keySize = 1024;
             double totalTime = 0;
             Console.WriteLine($"key size:{keySize}");
+            Console.WriteLine($"count:{count}");
             var tasks = new List<Task>();
             for (int i = 0; i < count; i++)
             {
