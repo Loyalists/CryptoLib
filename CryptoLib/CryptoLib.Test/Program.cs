@@ -150,10 +150,71 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
+        static void TestRSAEncryptAndDecrypt()
+        {
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
+            int count = 10;
+            int keySize = 2048;
+            double totalTime = 0;
+            string plainText = "Lorem ipsum dolor sit amet";
+            string encrypted = "";
+            string decrypted = "";
+            RSAService service = new RSAService();
+            service.KeySize = keySize;
+            var keys = service.Generate();
+            var publicKey = (RSAPublicKey)keys[RSAKeyType.PublicKey];
+            var privateKey = (RSAPrivateKey)keys[RSAKeyType.PrivateKey];
+
+            Console.WriteLine($"key size:{keySize}");
+            Console.WriteLine($"count:{count}");
+            Console.WriteLine($"plainText:{plainText}");
+            var tasks = new List<Task>();
+            for (int i = 0; i < count; i++)
+            {
+                var task = Task.Factory.StartNew(() =>
+                {
+                    var sw = Stopwatch.StartNew();
+                    encrypted = service.Encrypt(plainText, publicKey);
+                    sw.Stop();
+                    double time = sw.Elapsed.TotalSeconds;
+                    totalTime += time;
+                    Console.WriteLine($"time elapsed for encryption:{time}");
+                });
+                tasks.Add(task);
+            }
+            Task t = Task.WhenAll(tasks);
+            t.Wait();
+            tasks.Clear();
+            Console.WriteLine($"average:{totalTime / count} secs");
+            Console.WriteLine($"encrypted:{encrypted}");
+            Console.WriteLine("");
+
+            totalTime = 0;
+            for (int i = 0; i < count; i++)
+            {
+                var task = Task.Factory.StartNew(() =>
+                {
+                    var sw = Stopwatch.StartNew();
+                    decrypted = service.Decrypt(encrypted, privateKey);
+                    sw.Stop();
+                    double time = sw.Elapsed.TotalSeconds;
+                    totalTime += time;
+                    Console.WriteLine($"time elapsed for decryption:{time}");
+                });
+                tasks.Add(task);
+            }
+            Task t2 = Task.WhenAll(tasks);
+            t2.Wait();
+            Console.WriteLine($"average:{totalTime / count} secs");
+            Console.WriteLine($"decrypted:{decrypted}");
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
+        }
+
         static void Main(string[] args)
         {
             //TestRSA();
-            TestRSAGenerateKey();
+            //TestRSAGenerateKey();
+            TestRSAEncryptAndDecrypt();
             //TestDES();
         }
     }
