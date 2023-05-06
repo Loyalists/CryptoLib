@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoLib.Test", "CryptoLib
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoLib", "CryptoLib\CryptoLib.csproj", "{C74375E7-97ED-4980-812D-36ED7CAC4A20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoLib.UI", "CryptoLib.UI\CryptoLib.UI.csproj", "{E962E7B5-0BD2-495E-8FCF-3C99E873A55D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoLib.UI", "CryptoLib.UI\CryptoLib.UI.csproj", "{E962E7B5-0BD2-495E-8FCF-3C99E873A55D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
