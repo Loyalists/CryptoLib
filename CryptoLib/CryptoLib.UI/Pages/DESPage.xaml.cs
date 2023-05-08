@@ -78,8 +78,15 @@ namespace CryptoLib.UI.Pages
             var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
             try
             {
+                byte[]? salt = null;
+                if (!string.IsNullOrEmpty(SaltForKeyGeneratorTextBox.Text))
+                {
+                    salt = Convert.FromHexString(SaltForKeyGeneratorTextBox.Text);
+                }
+
                 DESService service = new DESService();
                 service.Passphrase = passphrase;
+                service.Salt = salt;
                 var keysTask = service.GenerateAsync();
                 GenerateButton.IsEnabled = false;
                 string buttonText = (string)GenerateButton.Content;

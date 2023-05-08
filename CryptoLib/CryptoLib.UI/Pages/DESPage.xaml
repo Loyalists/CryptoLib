@@ -27,7 +27,8 @@
 
                         <Grid Grid.Column="0">
                             <ui:SimpleStackPanel  Margin="12" Spacing="12">
-                                <TextBox x:Name="PassphraseTextBox" TextWrapping="Wrap" Text="" MinHeight="160" ui:ControlHelper.Header="Passphrase"/>
+                                <TextBox x:Name="PassphraseTextBox" TextWrapping="Wrap" Text="" MinHeight="98" ui:ControlHelper.Header="Passphrase"/>
+                                <TextBox x:Name="SaltForKeyGeneratorTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt (for key generation only)"/>
                             </ui:SimpleStackPanel>
                         </Grid>                        
                         

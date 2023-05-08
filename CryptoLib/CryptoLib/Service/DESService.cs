@@ -18,6 +18,7 @@ namespace CryptoLib.Service
         public uint Iteration { get; set; } = 4096;
         public DESPaddingScheme Padding { get; set; } = DESPaddingScheme.PKCS5;
         public BlockCipherMode CipherMode { get; set; } = BlockCipherMode.ECB;
+        public byte[]? Salt { get; set; }
         private int saltSize = 8;
         private int IVSize = 8;
         private int blockSize = 8;
@@ -165,7 +166,16 @@ namespace CryptoLib.Service
                 throw new ArgumentNullException();
             }
 
-            byte[] salt = MathHelper.GetRandomBytes(saltSize);
+            byte[] salt;
+            if (Salt != null)
+            {
+                salt = Salt;
+            }
+            else
+            {
+                salt = MathHelper.GetRandomBytes(saltSize);
+            }
+
             byte[] IV = MathHelper.GetRandomBytes(IVSize);
             byte[] _key = KeyDerivation.PBKDF2(Encoding.UTF8.GetBytes(Passphrase), salt, Iteration, 7);
             BitArray ba_key = new BitArray(_key);
