@@ -19,14 +19,15 @@ namespace CryptoLib.Service
         public DESPaddingScheme Padding { get; set; } = DESPaddingScheme.PKCS5;
         public BlockCipherMode CipherMode { get; set; } = BlockCipherMode.ECB;
         public byte[]? Salt { get; set; }
-        private int saltSize = 8;
-        private int IVSize = 8;
-        private int blockSize = 8;
+
+        public static readonly int SaltSize = 8;
+        public static readonly int IVSize = 8;
+        public static readonly int BlockSize = 8;
 
         public byte[] DecryptBlock(byte[] data, IKey key)
         {
             var encrypted = Algorithm.DES.Decrypt(data, key.ToByteArray());
-            byte[] bytes = new byte[blockSize];
+            byte[] bytes = new byte[BlockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
         }
@@ -44,20 +45,20 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
+            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             var func = DecryptBlock;
-            if (CipherMode == BlockCipherMode.CFB)
+            if (CipherMode == BlockCipherMode.CFB || CipherMode == BlockCipherMode.CTR)
             {
                 func = EncryptBlock;
             }
 
-            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
-            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
             Dictionary<string, object> param = new Dictionary<string, object>()
             {
                 { "IV", deskey.IV },
             };
 
-            List<byte[]> encrypted = Helper.SplitByCount(data, blockSize);
+            List<byte[]> encrypted = Helper.SplitByCount(data, BlockSize);
             List<byte[]> decrypted = mode.Decrypt(encrypted, key, func, param);
 
             List<byte> bytes = new List<byte>();
@@ -92,7 +93,7 @@ namespace CryptoLib.Service
             }
 
             var encrypted = Algorithm.DES.Encrypt(data, deskey.ToByteArray());
-            byte[] bytes = new byte[blockSize];
+            byte[] bytes = new byte[BlockSize];
             encrypted.CopyTo(bytes, 0);
             return bytes;
         }
@@ -124,7 +125,7 @@ namespace CryptoLib.Service
                 message = padding.Encode(data, key);
             }
 
-            List<byte[]> messageBlocks = Helper.SplitByCount(message, blockSize);
+            List<byte[]> messageBlocks = Helper.SplitByCount(message, BlockSize);
             List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, func, param);
             List<byte> bytes = new List<byte>();
             foreach (byte[] block in encrypted)
@@ -173,10 +174,10 @@ namespace CryptoLib.Service
             }
             else
             {
-                salt = MathHelper.GetRandomBytes(saltSize);
+                salt = MathHelper.GetRandomBytes(SaltSize);
             }
 
-            byte[] IV = MathHelper.GetRandomBytes(IVSize);
+            byte[] IV = CryptoHelper.GenerateIV(IVSize);
             byte[] _key = KeyDerivation.PBKDF2(Encoding.UTF8.GetBytes(Passphrase), salt, Iteration, 7);
             BitArray ba_key = new BitArray(_key);
             List<BitArray> list = BitHelper.SplitBitsByCount(ba_key, 7);

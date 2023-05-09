@@ -4,6 +4,7 @@ using CryptoLib.Service.Format;
 using CryptoLib.Service.Mode;
 using CryptoLib.Service.Padding;
 using CryptoLib.UI.Utility;
+using CryptoLib.Utility;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
@@ -112,6 +113,28 @@ namespace CryptoLib.UI.Pages
                     KeyTextBox.Text = Convert.ToBase64String(key.Bytes);
                     SaltTextBox.Text = Convert.ToBase64String(key.Salt);
                     IVTextBox.Text = Convert.ToBase64String(key.IV);
+                }
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void GenerateIVButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
+            try
+            {
+                byte[] iv = CryptoHelper.GenerateIV(DESService.IVSize);
+                if (selectedKeyFormat == "Hex")
+                {
+                    IVTextBox.Text = Convert.ToHexString(iv);
+                }
+                else
+                {
+                    IVTextBox.Text = Convert.ToBase64String(iv);
                 }
             }
             catch (Exception ex)

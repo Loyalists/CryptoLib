@@ -47,6 +47,7 @@
                             <ui:SimpleStackPanel  Margin="12" Spacing="12">
                                 <ComboBox x:Name="KeyFormatComboBox" ui:ControlHelper.Header="Key Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=KeyFormats}"/>
                                 <Button x:Name="GenerateButton" Content="Generate" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateButton_Click"/>
+                                <Button x:Name="GenerateIVButton" Content="Generate IV" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateIVButton_Click"/>
                             </ui:SimpleStackPanel>
                         </Grid>
                     </Grid>

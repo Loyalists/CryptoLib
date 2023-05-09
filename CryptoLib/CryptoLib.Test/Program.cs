@@ -116,6 +116,7 @@ namespace CryptoLib.Test
             {
                 Console.WriteLine("DES implementation is NOT valid.");
             }
+
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
@@ -214,8 +215,8 @@ namespace CryptoLib.Test
         {
             //TestRSA();
             //TestRSAGenerateKey();
-            TestRSAEncryptAndDecrypt();
-            //TestDES();
+            //TestRSAEncryptAndDecrypt();
+            TestDES();
         }
     }
 }
