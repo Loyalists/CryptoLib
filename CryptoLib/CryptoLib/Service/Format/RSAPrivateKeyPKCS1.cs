@@ -111,35 +111,41 @@ namespace CryptoLib.Service.Format
 
         public IKey FromByteArray(byte[] bytes)
         {
-            AsnReader reader = new AsnReader(bytes, AsnEncodingRules.DER);
-
-            AsnReader contents = reader.ReadSequence();
-
-            if (!contents.TryReadInt32(out int version) || version != 0)
+            try
             {
-                throw new Exception();
+                AsnReader reader = new AsnReader(bytes, AsnEncodingRules.DER);
+                AsnReader contents = reader.ReadSequence();
+
+                if (!contents.TryReadInt32(out int version) || version != 0)
+                {
+                    throw new Exception();
+                }
+
+                BigInteger modulus = contents.ReadInteger();
+                BigInteger publicExponent = contents.ReadInteger();
+                BigInteger privateExponent = contents.ReadInteger();
+                BigInteger prime1 = contents.ReadInteger();
+                BigInteger prime2 = contents.ReadInteger();
+                BigInteger exponent1 = contents.ReadInteger();
+                BigInteger exponent2 = contents.ReadInteger();
+                BigInteger coefficient = contents.ReadInteger();
+
+                RSAPrivateKey privateKey = new RSAPrivateKey();
+                privateKey.Modulus = modulus;
+                privateKey.PublicExponent = publicExponent;
+                privateKey.PrivateExponent = privateExponent;
+                privateKey.Prime1 = prime1;
+                privateKey.Prime2 = prime2;
+                privateKey.Exponent1 = exponent1;
+                privateKey.Exponent2 = exponent2;
+                privateKey.Coefficient = coefficient;
+
+                return privateKey;
             }
-
-            BigInteger modulus = contents.ReadInteger();
-            BigInteger publicExponent = contents.ReadInteger();
-            BigInteger privateExponent = contents.ReadInteger();
-            BigInteger prime1 = contents.ReadInteger();
-            BigInteger prime2 = contents.ReadInteger();
-            BigInteger exponent1 = contents.ReadInteger();
-            BigInteger exponent2 = contents.ReadInteger();
-            BigInteger coefficient = contents.ReadInteger();
-
-            RSAPrivateKey privateKey = new RSAPrivateKey();
-            privateKey.Modulus = modulus;
-            privateKey.PublicExponent = publicExponent;
-            privateKey.PrivateExponent = privateExponent;
-            privateKey.Prime1 = prime1;
-            privateKey.Prime2 = prime2;
-            privateKey.Exponent1 = exponent1;
-            privateKey.Exponent2 = exponent2;
-            privateKey.Coefficient = coefficient;
-
-            return privateKey;
+            catch (Exception)
+            {
+                throw new Exception("error reading key");
+            }
         }
 
         public IKey FromString(string str)

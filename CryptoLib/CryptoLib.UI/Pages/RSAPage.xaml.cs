@@ -3,12 +3,15 @@ using CryptoLib.Service;
 using CryptoLib.Service.Format;
 using CryptoLib.Service.Padding;
 using CryptoLib.UI.Utility;
+using CryptoLib.Utility;
+using Microsoft.Win32;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -177,6 +180,140 @@ namespace CryptoLib.UI.Pages
             {
                 string decryptedText = service.Decrypt(encryptedText, privateKey);
                 PlainTextBox.Text = decryptedText;
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void OpenPublicKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog();
+                dialog.Filter = "PEM|*.pem";
+                //dialog.FileName = "PublicKey";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                bool formatted = FormattedCheckBox.IsChecked == true;
+                var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
+                IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+
+                string keyText;
+                using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+                {
+                    keyText = sr.ReadToEnd();
+                }
+
+                RSAPublicKey key = RSAPublicKey.FromString(keyText, format);
+                PublicKeyTextBox.Text = key.ToString(format, formatted);
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void SavePublicKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new SaveFileDialog();
+                dialog.Filter = "PEM|*.pem";
+                dialog.FileName = "PublicKey";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                bool formatted = FormattedCheckBox.IsChecked == true;
+                string keyText = PublicKeyTextBox.Text;
+                var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
+                IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+                RSAPublicKey key = RSAPublicKey.FromString(keyText, format);
+                string keystr = key.ToString(format, formatted);
+
+                using (StreamWriter writer = new StreamWriter(path))
+                {
+                    writer.Write(keystr);
+                }
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void OpenPrivateKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog();
+                dialog.Filter = "PEM|*.pem";
+                //dialog.FileName = "PublicKey";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                bool formatted = FormattedCheckBox.IsChecked == true;
+                var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
+                IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+
+                string keyText;
+                using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+                {
+                    keyText = sr.ReadToEnd();
+                }
+
+                RSAPrivateKey key = RSAPrivateKey.FromString(keyText, format);
+                PrivateKeyTextBox.Text = key.ToString(format, formatted);
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void SavePrivateKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new SaveFileDialog();
+                dialog.Filter = "PEM|*.pem";
+                dialog.FileName = "PrivateKey";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                bool formatted = FormattedCheckBox.IsChecked == true;
+                string keyText = PrivateKeyTextBox.Text;
+                var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
+                IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+                RSAPrivateKey key = RSAPrivateKey.FromString(keyText, format);
+                string keystr = key.ToString(format, formatted);
+
+                using (StreamWriter writer = new StreamWriter(path))
+                {
+                    writer.Write(keystr);
+                }
             }
             catch (Exception ex)
             {

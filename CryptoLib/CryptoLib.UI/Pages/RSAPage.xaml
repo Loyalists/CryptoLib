@@ -27,7 +27,15 @@
                         <Grid Grid.Column="0">
                             <ui:SimpleStackPanel  Margin="12" Spacing="12">
                                 <TextBox x:Name="PublicKeyTextBox" TextWrapping="Wrap" Text="" MinHeight="96" ui:ControlHelper.Header="Public Key" AcceptsReturn="True"/>
+                                <ui:SimpleStackPanel Spacing="12" Orientation="Horizontal">
+                                    <Button x:Name="OpenPublicKeyButton" Content="Open" VerticalAlignment="Center" HorizontalAlignment="Left" Click="OpenPublicKeyButton_Click"/>
+                                    <Button x:Name="SavePublicKeyButton" Content="Save As" VerticalAlignment="Center" HorizontalAlignment="Left" Click="SavePublicKeyButton_Click"/>
+                                </ui:SimpleStackPanel>
                                 <TextBox x:Name="PrivateKeyTextBox" TextWrapping="Wrap" Text="" MinHeight="96" ui:ControlHelper.Header="Private Key" AcceptsReturn="True"/>
+                                <ui:SimpleStackPanel Spacing="12" Orientation="Horizontal">
+                                    <Button x:Name="OpenPrivateKeyButton" Content="Open" VerticalAlignment="Center" HorizontalAlignment="Left" Click="OpenPrivateKeyButton_Click"/>
+                                    <Button x:Name="SavePrivateKeyButton" Content="Save As" VerticalAlignment="Bottom" HorizontalAlignment="Center" Click="SavePrivateKeyButton_Click"/>
+                                </ui:SimpleStackPanel>
                             </ui:SimpleStackPanel>
                         </Grid>
 
@@ -70,7 +78,7 @@
                                 <Button x:Name="DecryptButton" Content="Decrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptButton_Click"/>
                             </ui:SimpleStackPanel>
                         </Grid>
-                        
+
                         <Grid Grid.Column="2">
                             <ui:SimpleStackPanel>
                                 <ui:SimpleStackPanel  Margin="12" Spacing="12">
