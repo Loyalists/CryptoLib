@@ -62,7 +62,7 @@ namespace CryptoLib.Service.Padding
             int hLen = hash.HashSize / 8;
             if (data.Length > k - 2 * hLen - 2)
             {
-                throw new ArgumentException("message too long");
+                throw new Exception("message too long");
             }
 
             byte[] padded = AddPadding(hash, data, k);
@@ -79,7 +79,7 @@ namespace CryptoLib.Service.Padding
             List<byte> decryptedBytes = data.ToList();
             if (decryptedBytes.Count == key.GetKeySize() && decryptedBytes[0] != 0x00)
             {
-                throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+                throw new Exception("error decoding, probably a corrupt key or an invalid padding format");
             }
 
             Encoding enc = Encoding.UTF8;
@@ -108,6 +108,12 @@ namespace CryptoLib.Service.Padding
                     break;
                 }
             }
+
+            if (pos == 0)
+            {
+                throw new Exception("error decoding, probably a corrupt key or an invalid padding format");
+            }
+
             byte[] message = DB.ToList().GetRange(pos, DB.Length - pos).ToArray();
             return message;
         }

@@ -33,14 +33,14 @@ namespace CryptoLib.Service.Padding
             int k = key.GetKeySize() / 8;
             if (data.Length > k - 11)
             {
-                throw new ArgumentException("message too long");
+                throw new Exception("message too long");
             }
 
             int r = k - 3 - data.Length;
 
             if (r <= 0)
             {
-                throw new ArgumentException();
+                throw new Exception();
             }
 
             byte[] padded = AddPadding(data, r);
@@ -57,12 +57,12 @@ namespace CryptoLib.Service.Padding
             List<byte> decryptedBytes = data.ToList();
             if (decryptedBytes.Count == key.GetKeySize() && decryptedBytes[0] != 0x00)
             {
-                throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+                throw new Exception("error decoding, probably a corrupt key or an invalid padding format");
             }
 
             if (decryptedBytes.Count < key.GetKeySize() && decryptedBytes[0] != 0x02)
             {
-                throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+                throw new Exception("error decoding, probably a corrupt key or an invalid padding format");
             }
 
             int pos = 0;
