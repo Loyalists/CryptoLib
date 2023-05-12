@@ -22,7 +22,7 @@ namespace CryptoLib.Service.Padding
             return result;
         }
 
-        public byte[] Encode(byte[] data, IKey? key)
+        public byte[] Encode(byte[] data, IKey? key, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPublicKey)
             {
@@ -47,7 +47,7 @@ namespace CryptoLib.Service.Padding
             return padded;
         }
 
-        public byte[] Decode(byte[] data, IKey? key = null)
+        public byte[] Decode(byte[] data, IKey? key = null, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPrivateKey)
             {

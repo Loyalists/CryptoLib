@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,15 @@ namespace CryptoLib.UI.Pages
             2048, 
             4096,
         };
+
+        public List<string> HashAlgorithmList { get; } = new List<string>() {
+            "SHA1",
+            "SHA256",
+            "SHA384",
+            "SHA512",
+            "MD5",
+        };
+
         public IEnumerable<RSAPublicKeyFormat> PublicKeyFormatTypes
         {
             get
@@ -73,6 +83,7 @@ namespace CryptoLib.UI.Pages
             PublicKeyFormatComboBox.SelectedItem = PublicKeyFormatTypes.FirstOrDefault();
             PrivateKeyFormatComboBox.SelectedItem = PrivateKeyFormatTypes.FirstOrDefault();
             PaddingSchemeComboBox.SelectedItem = PaddingSchemes.FirstOrDefault();
+            HashAlgorithmComboBox.SelectedItem = HashAlgorithmList.FirstOrDefault();
         }
 
         protected void OnPropertyChanged(string propertyName)
@@ -119,6 +130,7 @@ namespace CryptoLib.UI.Pages
             var selectedPublicKeyFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
             IKeyFormat publicKeyFormat = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedPublicKeyFormat);
 
+            string hash = HashAlgorithmList.ElementAt(HashAlgorithmComboBox.SelectedIndex);
             RSAPublicKey? publicKey;
             try
             {
@@ -130,6 +142,11 @@ namespace CryptoLib.UI.Pages
                 return;
             }
 
+            var customParams = new Dictionary<string, object>()
+            {
+                { "HashAlgorithm", hash },
+            };
+
             var selectedPaddingScheme = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
             int keySize = publicKey.GetKeySize();
             RSAService service = new RSAService();
@@ -137,7 +154,7 @@ namespace CryptoLib.UI.Pages
             service.KeySize = keySize;
             try
             {
-                string encryptedText = service.Encrypt(plainText, publicKey);
+                string encryptedText = service.Encrypt(plainText, publicKey, customParams);
                 EncryptedTextBox.Text = encryptedText;
             }
             catch (Exception ex)
@@ -159,6 +176,7 @@ namespace CryptoLib.UI.Pages
             var selectedPrivateKeyFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
             IKeyFormat privateKeyFormat = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedPrivateKeyFormat);
 
+            string hash = HashAlgorithmList.ElementAt(HashAlgorithmComboBox.SelectedIndex);
             RSAPrivateKey? privateKey;
             try
             {
@@ -170,6 +188,11 @@ namespace CryptoLib.UI.Pages
                 return;
             }
 
+            var customParams = new Dictionary<string, object>()
+            {
+                { "HashAlgorithm", hash },
+            };
+
             var selectedPaddingScheme = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
             int keySize = privateKey.GetKeySize();
             RSAService service = new RSAService();
@@ -178,7 +201,7 @@ namespace CryptoLib.UI.Pages
 
             try
             {
-                string decryptedText = service.Decrypt(encryptedText, privateKey);
+                string decryptedText = service.Decrypt(encryptedText, privateKey, customParams);
                 PlainTextBox.Text = decryptedText;
             }
             catch (Exception ex)

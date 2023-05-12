@@ -93,7 +93,7 @@ namespace CryptoLib.Service
             return keys;
         }
 
-        public byte[] Encrypt(byte[] data, IKey key)
+        public byte[] Encrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPublicKey)
             {
@@ -108,7 +108,7 @@ namespace CryptoLib.Service
             byte[] padded = data;
             if (padding != null)
             {
-                padded = padding.Encode(data, key);
+                padded = padding.Encode(data, key, param);
             }
 
             BigInteger encoded = new BigInteger(padded, isUnsigned: true, isBigEndian: true);
@@ -122,15 +122,15 @@ namespace CryptoLib.Service
             return encryptedBytes;
         }
 
-        public string Encrypt(string data, IKey key)
+        public string Encrypt(string data, IKey key, IDictionary<string, object>? param = null)
         {
             byte[] message = Encoding.UTF8.GetBytes(data);
-            byte[] encrypted = Encrypt(message, key);
+            byte[] encrypted = Encrypt(message, key, param);
             string encoded = Convert.ToBase64String(encrypted);
             return encoded;
         }
 
-        public byte[] Decrypt(byte[] data, IKey key)
+        public byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPrivateKey)
             {
@@ -152,16 +152,16 @@ namespace CryptoLib.Service
             byte[] decoded = decryptedBytes;
             if (padding != null)
             {
-                decoded = padding.Decode(decryptedBytes, key);
+                decoded = padding.Decode(decryptedBytes, key, param);
             }
 
             return decoded;
         }
 
-        public string Decrypt(string data, IKey key)
+        public string Decrypt(string data, IKey key, IDictionary<string, object>? param = null)
         {
             byte[] padded = Convert.FromBase64String(data);
-            byte[] decrypted = Decrypt(padded, key);
+            byte[] decrypted = Decrypt(padded, key, param);
             string decoded = Encoding.UTF8.GetString(decrypted);
             return decoded;
         }

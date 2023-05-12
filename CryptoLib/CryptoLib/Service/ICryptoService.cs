@@ -10,7 +10,7 @@ namespace CryptoLib.Service
 {
     public interface ICryptoService
     {
-        byte[] Encrypt(byte[] data, IKey key);
-        byte[] Decrypt(byte[] data, IKey key);
+        byte[] Encrypt(byte[] data, IKey key, IDictionary<string, object>? param = null);
+        byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null);
     }
 }

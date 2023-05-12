@@ -32,7 +32,7 @@ namespace CryptoLib.Service
             return bytes;
         }
 
-        public byte[] Decrypt(byte[] data, IKey key)
+        public byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             DESKey? deskey = key as DESKey;
             if (deskey == null)
@@ -53,13 +53,13 @@ namespace CryptoLib.Service
                 func = EncryptBlock;
             }
 
-            Dictionary<string, object> param = new Dictionary<string, object>()
+            Dictionary<string, object> modeParams = new Dictionary<string, object>()
             {
                 { "IV", deskey.IV },
             };
 
             List<byte[]> encrypted = Helper.SplitByCount(data, BlockSize);
-            List<byte[]> decrypted = mode.Decrypt(encrypted, key, func, param);
+            List<byte[]> decrypted = mode.Decrypt(encrypted, key, func, modeParams);
 
             List<byte> bytes = new List<byte>();
             for (int i = 0; i < decrypted.Count; i++)
@@ -70,16 +70,16 @@ namespace CryptoLib.Service
             byte[] result = bytes.ToArray();
             if (padding != null)
             {
-                result = padding.Decode(result, key);
+                result = padding.Decode(result, key, param);
             }
 
             return result;
         }
 
-        public string Decrypt(string data, IKey key)
+        public string Decrypt(string data, IKey key, IDictionary<string, object>? param = null)
         {
             byte[] encrypted = Convert.FromBase64String(data);
-            byte[] decrypted = Decrypt(encrypted, key);
+            byte[] decrypted = Decrypt(encrypted, key, param);
             string result = Encoding.UTF8.GetString(decrypted);
             return result;
         }
@@ -98,7 +98,7 @@ namespace CryptoLib.Service
             return bytes;
         }
 
-        public byte[] Encrypt(byte[] data, IKey key)
+        public byte[] Encrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             DESKey? deskey = key as DESKey;
             if (deskey == null)
@@ -114,7 +114,7 @@ namespace CryptoLib.Service
             var func = EncryptBlock;
             IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
-            Dictionary<string, object> param = new Dictionary<string, object>()
+            Dictionary<string, object> modeParams = new Dictionary<string, object>()
             {
                 { "IV", deskey.IV },
             };
@@ -122,11 +122,11 @@ namespace CryptoLib.Service
             byte[] message = data;
             if (padding != null)
             {
-                message = padding.Encode(data, key);
+                message = padding.Encode(data, key, param);
             }
 
             List<byte[]> messageBlocks = Helper.SplitByCount(message, BlockSize);
-            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, func, param);
+            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, func, modeParams);
             List<byte> bytes = new List<byte>();
             foreach (byte[] block in encrypted)
             {
@@ -136,10 +136,10 @@ namespace CryptoLib.Service
             return bytes.ToArray();
         }
 
-        public string Encrypt(string data, IKey key)
+        public string Encrypt(string data, IKey key, IDictionary<string, object>? param = null)
         {
             byte[] encoded = Encoding.UTF8.GetBytes(data);
-            byte[] encrypted = Encrypt(encoded, key);
+            byte[] encrypted = Encrypt(encoded, key, param);
             string result = Convert.ToBase64String(encrypted);
             return result;
         }

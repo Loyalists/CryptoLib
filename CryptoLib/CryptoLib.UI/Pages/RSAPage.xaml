@@ -76,6 +76,7 @@
                             </Grid.Background>
                             <ui:SimpleStackPanel  Margin="12" Spacing="12">
                                 <ComboBox x:Name="PaddingSchemeComboBox" ui:ControlHelper.Header="Padding Scheme" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=PaddingSchemes}"/>
+                                <ComboBox x:Name="HashAlgorithmComboBox" ui:ControlHelper.Header="Hash Algorithm" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=HashAlgorithmList}"/>
                                 <Button x:Name="EncryptButton" Content="Encrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptButton_Click"/>
                                 <Button x:Name="DecryptButton" Content="Decrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptButton_Click"/>
                             </ui:SimpleStackPanel>

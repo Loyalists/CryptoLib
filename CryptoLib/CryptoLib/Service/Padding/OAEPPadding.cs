@@ -47,17 +47,42 @@ namespace CryptoLib.Service.Padding
             return result.ToArray();
         }
 
-        public byte[] Encode(byte[] data, IKey? key)
+        private HashAlgorithm GetHashAlgorithm(IDictionary<string, object>? param)
+        {
+            string default_hash_name = "SHA1";
+            string? hash_name = default_hash_name;
+            if (param != null)
+            {
+                object? result;
+                bool success = param.TryGetValue("HashAlgorithm", out result);
+                if (success)
+                {
+                    hash_name = (string?)result;
+                }
+            }
+
+            if (string.IsNullOrEmpty(hash_name))
+            {
+                hash_name = default_hash_name;
+            }
+
+            var hash = HashAlgorithm.Create(hash_name);
+            if (hash == null)
+            {
+                throw new Exception();
+            }
+            return hash;
+        }
+
+        public byte[] Encode(byte[] data, IKey? key, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPublicKey)
             {
                 throw new InvalidCastException();
             }
 
-            RSAPublicKey publicKey = (RSAPublicKey)key;
-            BigInteger n = publicKey.Modulus;
+            var hash = GetHashAlgorithm(param);
 
-            HashAlgorithm hash = SHA256.Create();
             int k = key.GetKeySize() / 8;
             int hLen = hash.HashSize / 8;
             if (data.Length > k - 2 * hLen - 2)
@@ -69,7 +94,7 @@ namespace CryptoLib.Service.Padding
             return padded;
         }
 
-        public byte[] Decode(byte[] data, IKey? key = null)
+        public byte[] Decode(byte[] data, IKey? key = null, IDictionary<string, object>? param = null)
         {
             if (key is not RSAPrivateKey)
             {
@@ -83,7 +108,8 @@ namespace CryptoLib.Service.Padding
             }
 
             Encoding enc = Encoding.UTF8;
-            HashAlgorithm hash = SHA256.Create();
+            var hash = GetHashAlgorithm(param);
+
             int k = key.GetKeySize() / 8;
             byte[] lHash = hash.ComputeHash(enc.GetBytes(""));
             int hLen = hash.HashSize / 8;
