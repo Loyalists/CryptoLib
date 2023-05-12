@@ -146,6 +146,7 @@ namespace CryptoLib.Service
             {
                 throw new ArgumentException("message too long");
             }
+
             BigInteger decrypted = RSA.Decrypt(encrypted, d, n);
             byte[] decryptedBytes = decrypted.ToByteArray(isUnsigned: true, isBigEndian: true);
             byte[] decoded = decryptedBytes;

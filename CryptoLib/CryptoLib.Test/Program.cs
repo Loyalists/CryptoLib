@@ -23,6 +23,7 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             RSAService service = new RSAService();
             service.KeySize = 1024;
+            service.Padding = RSAPaddingScheme.OAEP;
             var publicKeyFormat = new RSAPublicKeyPKCS8();
             var privateKeyFormat = new RSAPrivateKeyPKCS1();
 
@@ -213,7 +214,7 @@ namespace CryptoLib.Test
 
         static void Main(string[] args)
         {
-            //TestRSA();
+            TestRSA();
             //TestRSAGenerateKey();
             //TestRSAEncryptAndDecrypt();
             TestDES();

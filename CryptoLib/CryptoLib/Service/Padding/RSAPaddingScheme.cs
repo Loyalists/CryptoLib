@@ -11,6 +11,7 @@ namespace CryptoLib.Service.Padding
     {
         Textbook,
         PKCS1,
+        OAEP,
     }
 
     public static class RSAPaddingSchemeFactory
@@ -19,6 +20,7 @@ namespace CryptoLib.Service.Padding
         {
             { RSAPaddingScheme.Textbook, null },
             { RSAPaddingScheme.PKCS1, typeof(PKCS1Padding) },
+            { RSAPaddingScheme.OAEP, typeof(OAEPPadding) },
         };
 
         public static IPaddingScheme? CreateInstance(RSAPaddingScheme padding)

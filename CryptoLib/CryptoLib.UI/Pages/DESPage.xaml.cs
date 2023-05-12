@@ -5,12 +5,17 @@ using CryptoLib.Service.Mode;
 using CryptoLib.Service.Padding;
 using CryptoLib.UI.Utility;
 using CryptoLib.Utility;
+using Microsoft.Win32;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -76,7 +81,6 @@ namespace CryptoLib.UI.Pages
                 return;
             }
 
-            var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
             try
             {
                 byte[]? salt = null;
@@ -102,18 +106,7 @@ namespace CryptoLib.UI.Pages
                     throw new Exception();
                 }
 
-                if (selectedKeyFormat == "Hex")
-                {
-                    KeyTextBox.Text = key.ToString(null);
-                    SaltTextBox.Text = Convert.ToHexString(key.Salt);
-                    IVTextBox.Text = Convert.ToHexString(key.IV);
-                }
-                else
-                {
-                    KeyTextBox.Text = Convert.ToBase64String(key.Bytes);
-                    SaltTextBox.Text = Convert.ToBase64String(key.Salt);
-                    IVTextBox.Text = Convert.ToBase64String(key.IV);
-                }
+                SetKey(key);
             }
             catch (Exception ex)
             {
@@ -256,6 +249,101 @@ namespace CryptoLib.UI.Pages
             key.IV = iv;
 
             return key;
+        }
+
+        private void SetKey(DESKey key)
+        {
+            SaltTextBox.Text = string.Empty;
+            IVTextBox.Text = string.Empty;
+            var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
+            if (selectedKeyFormat == "Hex")
+            {
+                KeyTextBox.Text = key.ToString(null);
+                if (key.Salt != null)
+                {
+                    SaltTextBox.Text = Convert.ToHexString(key.Salt);
+                }
+
+                if (key.IV != null)
+                {
+                    IVTextBox.Text = Convert.ToHexString(key.IV);
+                }
+            }
+            else
+            {
+                KeyTextBox.Text = Convert.ToBase64String(key.Bytes);
+                if (key.Salt != null)
+                {
+                    SaltTextBox.Text = Convert.ToBase64String(key.Salt);
+                }
+
+                if (key.IV != null)
+                {
+                    IVTextBox.Text = Convert.ToBase64String(key.IV);
+                }
+            }
+        }
+
+        private async void OpenKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog();
+                dialog.Filter = "JSON|*.json";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                string keyText;
+                using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+                {
+                    keyText = sr.ReadToEnd();
+                }
+
+                DESKey? key = JsonSerializer.Deserialize<DESKey>(keyText);
+                if (key == null)
+                {
+                    throw new Exception();
+                }
+
+                SetKey(key);
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void SaveKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new SaveFileDialog();
+                dialog.Filter = "JSON|*.json";
+                dialog.FileName = "DESKey";
+                string path;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                path = dialog.FileName;
+
+                DESKey key = GetKey();
+                string keystr = JsonSerializer.Serialize(key);
+                using (StreamWriter writer = new StreamWriter(path))
+                {
+                    writer.Write(keystr);
+                }
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
         }
     }
 }

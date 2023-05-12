@@ -30,10 +30,7 @@ namespace CryptoLib.Service.Padding
             }
 
             // https://crypto.stackexchange.com/questions/66521/why-does-adding-pkcs1-v1-5-padding-make-rsa-encryption-non-deterministic
-            RSAPublicKey publicKey = (RSAPublicKey)key;
-            BigInteger n = publicKey.Modulus;
-
-            int k = n.GetByteCount(true);
+            int k = key.GetKeySize() / 8;
             if (data.Length > k - 11)
             {
                 throw new ArgumentException("message too long");
@@ -52,11 +49,19 @@ namespace CryptoLib.Service.Padding
 
         public byte[] Decode(byte[] data, IKey? key = null)
         {
-            List<byte> decryptedBytes = data.ToList();
-
-            if (decryptedBytes[0] != 0x00 && decryptedBytes[0] != 0x02)
+            if (key is not RSAPrivateKey)
             {
-                Console.WriteLine(Convert.ToHexString(decryptedBytes.ToArray()));
+                throw new InvalidCastException();
+            }
+
+            List<byte> decryptedBytes = data.ToList();
+            if (decryptedBytes.Count == key.GetKeySize() && decryptedBytes[0] != 0x00)
+            {
+                throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+            }
+
+            if (decryptedBytes.Count < key.GetKeySize() && decryptedBytes[0] != 0x02)
+            {
                 throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
             }
 
