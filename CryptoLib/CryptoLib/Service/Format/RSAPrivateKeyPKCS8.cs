@@ -11,13 +11,11 @@ using System.Threading.Tasks;
 
 namespace CryptoLib.Service.Format
 {
-    public class RSAPrivateKeyPKCS1 : IKeyFormat
+    public class RSAPrivateKeyPKCS8 : IKeyFormat
     {
-        // PKCS #1
-        // https://www.rfc-editor.org/rfc/rfc5208#appendix-A
-        // https://www.rfc-editor.org/rfc/rfc8017
-        public static readonly string Header = "-----BEGIN RSA PRIVATE KEY-----";
-        public static readonly string Footer = "-----END RSA PRIVATE KEY-----";
+        public static readonly string Header = "-----BEGIN PRIVATE KEY-----";
+        public static readonly string Footer = "-----END PRIVATE KEY-----";
+        public static readonly string Oid = "1.2.840.113549.1.1.1";
         public byte[] ToByteArray(IKey key)
         {
             if (key is not RSAPrivateKey)
@@ -31,16 +29,30 @@ namespace CryptoLib.Service.Format
             using (writer.PushSequence())
             {
                 writer.WriteInteger(privateKey.Version);
-                writer.WriteInteger(privateKey.Modulus);
-                writer.WriteInteger(privateKey.PublicExponent);
-                writer.WriteInteger(privateKey.PrivateExponent);
-                writer.WriteInteger(privateKey.Prime1);
-                writer.WriteInteger(privateKey.Prime2);
-                writer.WriteInteger(privateKey.Exponent1);
-                writer.WriteInteger(privateKey.Exponent2);
-                writer.WriteInteger(privateKey.Coefficient);
+                using (writer.PushSequence())
+                {
+                    writer.WriteObjectIdentifier(Oid);
+                    writer.WriteNull();
+                }
 
+                var writerInner = new AsnWriter(AsnEncodingRules.DER);
+                using (writerInner.PushSequence())
+                {
+                    writerInner.WriteInteger(privateKey.Version);
+                    writerInner.WriteInteger(privateKey.Modulus);
+                    writerInner.WriteInteger(privateKey.PublicExponent);
+                    writerInner.WriteInteger(privateKey.PrivateExponent);
+                    writerInner.WriteInteger(privateKey.Prime1);
+                    writerInner.WriteInteger(privateKey.Prime2);
+                    writerInner.WriteInteger(privateKey.Exponent1);
+                    writerInner.WriteInteger(privateKey.Exponent2);
+                    writerInner.WriteInteger(privateKey.Coefficient);
+
+                }
+                byte[] valueInner = writerInner.Encode();
+                writer.WriteOctetString(valueInner);
             }
+
             byte[] value = writer.Encode();
             return value;
         }
@@ -87,22 +99,29 @@ namespace CryptoLib.Service.Format
             {
                 AsnReader reader = new AsnReader(bytes, AsnEncodingRules.DER);
                 AsnReader contents = reader.ReadSequence();
-
-                if (!contents.TryReadInt32(out int version) || version != 0)
+                if (!contents.TryReadInt32(out int _version) || _version != 0)
                 {
                     throw new Exception();
                 }
 
-                BigInteger modulus = contents.ReadInteger();
-                BigInteger publicExponent = contents.ReadInteger();
-                BigInteger privateExponent = contents.ReadInteger();
-                BigInteger prime1 = contents.ReadInteger();
-                BigInteger prime2 = contents.ReadInteger();
-                BigInteger exponent1 = contents.ReadInteger();
-                BigInteger exponent2 = contents.ReadInteger();
-                BigInteger coefficient = contents.ReadInteger();
+                contents.ReadSequence();
+                byte[] octetString = contents.ReadOctetString();
+
+                AsnReader osReader = new AsnReader(octetString, AsnEncodingRules.DER);
+                AsnReader osContents = osReader.ReadSequence();
+
+                BigInteger version = osContents.ReadInteger();
+                BigInteger modulus = osContents.ReadInteger();
+                BigInteger publicExponent = osContents.ReadInteger();
+                BigInteger privateExponent = osContents.ReadInteger();
+                BigInteger prime1 = osContents.ReadInteger();
+                BigInteger prime2 = osContents.ReadInteger();
+                BigInteger exponent1 = osContents.ReadInteger();
+                BigInteger exponent2 = osContents.ReadInteger();
+                BigInteger coefficient = osContents.ReadInteger();
 
                 RSAPrivateKey privateKey = new RSAPrivateKey();
+                privateKey.Version = version;
                 privateKey.Modulus = modulus;
                 privateKey.PublicExponent = publicExponent;
                 privateKey.PrivateExponent = privateExponent;

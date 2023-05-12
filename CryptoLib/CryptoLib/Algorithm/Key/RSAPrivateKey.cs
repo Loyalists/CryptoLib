@@ -12,7 +12,7 @@ namespace CryptoLib.Algorithm.Key
 {
     public class RSAPrivateKey : IKey
     {
-        public int Version { get; set; } = 0;
+        public BigInteger Version { get; set; } = 0;
         public BigInteger Modulus { get; set; } //n
         public BigInteger PublicExponent { get; set; } //e
         public BigInteger PrivateExponent { get; set; } //d

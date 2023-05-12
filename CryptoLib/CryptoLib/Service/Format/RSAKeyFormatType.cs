@@ -15,6 +15,7 @@ namespace CryptoLib.Service.Format
     public enum RSAPrivateKeyFormat
     {
         PKCS1,
+        PKCS8,
     }
 
     public static class RSAKeyFormatType
@@ -28,6 +29,7 @@ namespace CryptoLib.Service.Format
         public static Dictionary<RSAPrivateKeyFormat, Type> PrivateKeyFormatMap = new Dictionary<RSAPrivateKeyFormat, Type>()
         {
             { RSAPrivateKeyFormat.PKCS1, typeof(RSAPrivateKeyPKCS1) },
+            { RSAPrivateKeyFormat.PKCS8, typeof(RSAPrivateKeyPKCS8) },
         };
 
         public static IKeyFormat CreatePublicKeyFormatInstance(RSAPublicKeyFormat publicKeyFormat)
