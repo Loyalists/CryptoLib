@@ -321,5 +321,51 @@ namespace CryptoLib.UI.Pages
                 return;
             }
         }
+
+        private async void AnalyzePublicKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            string keyText = PublicKeyTextBox.Text;
+            if (string.IsNullOrEmpty(keyText))
+            {
+                return;
+            }
+
+            var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
+            IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+            try
+            {
+                RSAPublicKey key = RSAPublicKey.FromString(keyText, format);
+                var dialog = new KeyAnalyzer(key);
+                await dialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void AnalyzePrivateKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            string keyText = PrivateKeyTextBox.Text;
+            if (string.IsNullOrEmpty(keyText))
+            {
+                return;
+            }
+
+            var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
+            IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+            try
+            {
+                RSAPrivateKey key = RSAPrivateKey.FromString(keyText, format);
+                var dialog = new KeyAnalyzer(key);
+                await dialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
     }
 }

@@ -30,11 +30,13 @@
                                 <ui:SimpleStackPanel Spacing="12" Orientation="Horizontal">
                                     <Button x:Name="OpenPublicKeyButton" Content="Open" VerticalAlignment="Center" HorizontalAlignment="Left" Click="OpenPublicKeyButton_Click"/>
                                     <Button x:Name="SavePublicKeyButton" Content="Save As" VerticalAlignment="Center" HorizontalAlignment="Left" Click="SavePublicKeyButton_Click"/>
+                                    <Button x:Name="AnalyzePublicKeyButton" Content="Analyze" VerticalAlignment="Center" HorizontalAlignment="Left" Click="AnalyzePublicKeyButton_Click"/>
                                 </ui:SimpleStackPanel>
                                 <TextBox x:Name="PrivateKeyTextBox" TextWrapping="Wrap" Text="" MinHeight="96" ui:ControlHelper.Header="Private Key" AcceptsReturn="True"/>
                                 <ui:SimpleStackPanel Spacing="12" Orientation="Horizontal">
                                     <Button x:Name="OpenPrivateKeyButton" Content="Open" VerticalAlignment="Center" HorizontalAlignment="Left" Click="OpenPrivateKeyButton_Click"/>
-                                    <Button x:Name="SavePrivateKeyButton" Content="Save As" VerticalAlignment="Bottom" HorizontalAlignment="Center" Click="SavePrivateKeyButton_Click"/>
+                                    <Button x:Name="SavePrivateKeyButton" Content="Save As" VerticalAlignment="Center" HorizontalAlignment="Left" Click="SavePrivateKeyButton_Click"/>
+                                    <Button x:Name="AnalyzePrivateKeyButton" Content="Analyze" VerticalAlignment="Center" HorizontalAlignment="Left" Click="AnalyzePrivateKeyButton_Click"/>
                                 </ui:SimpleStackPanel>
                             </ui:SimpleStackPanel>
                         </Grid>

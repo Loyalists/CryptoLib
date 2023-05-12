@@ -35,5 +35,10 @@ namespace CryptoLib.Algorithm.Key
         {
             return Bytes;
         }
+
+        public int GetKeySize()
+        {
+            return 56;
+        }
     }
 }

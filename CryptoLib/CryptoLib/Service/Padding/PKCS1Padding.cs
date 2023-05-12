@@ -47,14 +47,6 @@ namespace CryptoLib.Service.Padding
             }
 
             byte[] padded = AddPadding(data, r);
-            //BigInteger paddedInt = new BigInteger(padded);
-            // dirty hack
-            //if (paddedInt > n)
-            //{
-            //    r = r - 1;
-            //    padded = AddPadding(data, r);
-            //}
-
             return padded;
         }
 
@@ -66,6 +58,11 @@ namespace CryptoLib.Service.Padding
             for (int i = 0; i < decryptedBytes.Count; i++)
             {
                 byte value = decryptedBytes[i];
+                if (i == 0 && value != 0x00)
+                {
+                    throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+                }
+
                 if (value == 0x00 && i != 0)
                 {
                     pos = i + 1;

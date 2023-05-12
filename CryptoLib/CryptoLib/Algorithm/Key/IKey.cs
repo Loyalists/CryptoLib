@@ -11,5 +11,7 @@ namespace CryptoLib.Algorithm.Key
     {
         string ToString(IKeyFormat? keyFormat = null, bool isFormatted = true);
         byte[] ToByteArray(IKeyFormat? keyFormat = null);
+
+        int GetKeySize();
     }
 }

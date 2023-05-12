@@ -1,0 +1,12 @@
+﻿<ui:ContentDialog x:Class="CryptoLib.UI.Pages.KeyAnalyzer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="Analysis"
+    CloseButtonText="Ok">
+
+    <ScrollViewer>
+        <ui:SimpleStackPanel x:Name="ResultPanel" Margin="0,0,12,0" Spacing="12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        </ui:SimpleStackPanel>
+    </ScrollViewer>
+</ui:ContentDialog>
