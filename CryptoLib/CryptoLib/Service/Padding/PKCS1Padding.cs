@@ -54,15 +54,16 @@ namespace CryptoLib.Service.Padding
         {
             List<byte> decryptedBytes = data.ToList();
 
+            if (decryptedBytes[0] != 0x00 && decryptedBytes[0] != 0x02)
+            {
+                Console.WriteLine(Convert.ToHexString(decryptedBytes.ToArray()));
+                throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
+            }
+
             int pos = 0;
             for (int i = 0; i < decryptedBytes.Count; i++)
             {
                 byte value = decryptedBytes[i];
-                if (i == 0 && value != 0x00)
-                {
-                    throw new ArgumentException("error decoding, probably a corrupt key or wrong padding format");
-                }
-
                 if (value == 0x00 && i != 0)
                 {
                     pos = i + 1;
