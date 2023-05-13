@@ -19,9 +19,6 @@ using Frame = ModernWpf.Controls.Frame;
 
 namespace CryptoLib.UI
 {
-    /// <summary>
-    /// NavigationRootPage.xaml 的交互逻辑
-    /// </summary>
     public partial class NavigationRootPage : Page
     {
         public static Frame? RootFrame { get; set; }

@@ -9,6 +9,6 @@
         xmlns:pages="clr-namespace:CryptoLib.UI.Pages"
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
-        Title="MainWindow" Height="810" Width="1440">
-    <local:NavigationRootPage x:Name="RootPage" />
+        Title="CryptoLib.UI" Height="810" Width="1440">
+    <local:NavigationViewPage x:Name="RootPage" />
 </Window>
