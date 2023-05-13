@@ -29,9 +29,6 @@ using System.Windows.Shapes;
 
 namespace CryptoLib.UI.Pages
 {
-    /// <summary>
-    /// RSAPage.xaml 的交互逻辑
-    /// </summary>
     public partial class DESPage
     {
         public DESPaddingScheme DefaultPaddingScheme = DESPaddingScheme.PKCS5;
@@ -338,6 +335,114 @@ namespace CryptoLib.UI.Pages
                 {
                     writer.Write(keystr);
                 }
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void EncryptFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
+            var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
+
+            if (selectedPadding == DESPaddingScheme.None)
+            {
+                if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
+                {
+                    await UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
+                    return;
+                }
+            }
+
+            try
+            {
+                var dialog = new OpenFileDialog();
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                string path = dialog.FileName;
+
+                var dialog_save = new SaveFileDialog();
+                if (dialog_save.ShowDialog() != true)
+                {
+                    return;
+                }
+                string path_save = dialog_save.FileName;
+
+                DESService service = new DESService();
+                service.CipherMode = selectedMode;
+                service.Padding = selectedPadding;
+                DESKey key = GetKey();
+
+                byte[] plainData = File.ReadAllBytes(path);
+                byte[] encrypted = service.Encrypt(plainData, key);
+                using (var stream = File.Open(path_save, FileMode.Create))
+                {
+                    using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                    {
+                        writer.Write(encrypted);
+                    }
+                }
+
+                await UIHelper.ShowSimpleDialog($"The encrypted file has been saved in {path_save}.");
+            }
+            catch (Exception ex)
+            {
+                await UIHelper.ShowSimpleDialog(ex.ToString());
+                return;
+            }
+        }
+
+        private async void DecryptFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMode = Modes.ElementAt(ModeComboBox.SelectedIndex);
+            var selectedPadding = PaddingSchemes.ElementAt(PaddingSchemeComboBox.SelectedIndex);
+
+            if (selectedPadding == DESPaddingScheme.None)
+            {
+                if (selectedMode == BlockCipherMode.ECB || selectedMode == BlockCipherMode.CBC)
+                {
+                    await UIHelper.ShowSimpleDialog("ECB and CBC cipher mode require a valid padding scheme to function!");
+                    return;
+                }
+            }
+
+            try
+            {
+                var dialog = new OpenFileDialog();
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+                string path = dialog.FileName;
+
+                var dialog_save = new SaveFileDialog();
+                if (dialog_save.ShowDialog() != true)
+                {
+                    return;
+                }
+                string path_save = dialog_save.FileName;
+
+                DESService service = new DESService();
+                service.CipherMode = selectedMode;
+                service.Padding = selectedPadding;
+                DESKey key = GetKey();
+
+                byte[] encrypted = File.ReadAllBytes(path);
+                byte[] decrypted = service.Decrypt(encrypted, key);
+                using (var stream = File.Open(path_save, FileMode.Create))
+                {
+                    using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                    {
+                        writer.Write(decrypted);
+                    }
+                }
+
+                await UIHelper.ShowSimpleDialog($"The decrypted file has been saved in {path_save}.");
             }
             catch (Exception ex)
             {

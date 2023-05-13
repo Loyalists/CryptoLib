@@ -27,9 +27,6 @@ using System.Windows.Shapes;
 
 namespace CryptoLib.UI.Pages
 {
-    /// <summary>
-    /// RSAPage.xaml 的交互逻辑
-    /// </summary>
     public partial class RSAPage : INotifyPropertyChanged
     {
         public int DefaultKeySize = 1024;

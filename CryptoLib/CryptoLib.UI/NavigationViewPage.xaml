@@ -12,7 +12,7 @@
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <Grid>
-        <muxc:NavigationView x:Name="NavView" IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneOpen="False" SelectionChanged="NavigationView_SelectionChanged" >
+        <muxc:NavigationView x:Name="NavView" IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneOpen="True" SelectionChanged="NavigationView_SelectionChanged" >
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Content="RSA" Tag="RSA" Icon="Permissions" />
                 <muxc:NavigationViewItem Content="DES" Tag="DES" Icon="Permissions" />

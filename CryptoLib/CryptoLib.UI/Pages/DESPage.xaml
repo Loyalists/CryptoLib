@@ -26,14 +26,14 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
                                 <TextBox x:Name="PassphraseTextBox" TextWrapping="Wrap" Text="" MinHeight="98" ui:ControlHelper.Header="Passphrase"/>
                                 <TextBox x:Name="SaltForKeyGeneratorTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt (for key generation only)"/>
                             </ui:SimpleStackPanel>
                         </Grid>                        
                         
                         <Grid Grid.Column="1">
-                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
                                 <TextBox x:Name="KeyTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Key"/>
                                 <TextBox x:Name="SaltTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt"/>
                                 <TextBox x:Name="IVTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="IV"/>
@@ -44,7 +44,7 @@
                             <Grid.Background>
                                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                             </Grid.Background>
-                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
                                 <ComboBox x:Name="KeyFormatComboBox" ui:ControlHelper.Header="Key Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=KeyFormats}"/>
                                 <Button x:Name="GenerateButton" Content="Generate" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateButton_Click"/>
                                 <Button x:Name="GenerateIVButton" Content="Generate IV" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateIVButton_Click"/>
@@ -63,8 +63,8 @@
 
                         <Grid Grid.Column="0">
                             <ui:SimpleStackPanel>
-                                <ui:SimpleStackPanel  Margin="12" Spacing="12">
-                                    <TextBox x:Name="PlainTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Plain Text" AcceptsReturn="True"/>
+                                <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                    <TextBox x:Name="PlainTextBox" TextWrapping="Wrap" Text="" MinHeight="320" ui:ControlHelper.Header="Plain Text" AcceptsReturn="True"/>
                                 </ui:SimpleStackPanel>
                             </ui:SimpleStackPanel>
                         </Grid>
@@ -73,24 +73,25 @@
                             <Grid.Background>
                                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                             </Grid.Background>
-                            <ui:SimpleStackPanel  Margin="12" Spacing="12">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
                                 <ComboBox x:Name="PaddingSchemeComboBox" ui:ControlHelper.Header="Padding Scheme" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=PaddingSchemes}"/>
                                 <ComboBox x:Name="ModeComboBox" ui:ControlHelper.Header="Mode" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=Modes}"/>
                                 <ComboBox x:Name="TextFormatComboBox" ui:ControlHelper.Header="Text Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=TextFormats}"/>
                                 <Button x:Name="EncryptButton" Content="Encrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptButton_Click"/>
                                 <Button x:Name="DecryptButton" Content="Decrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptButton_Click"/>
+                                <Button x:Name="EncryptFileButton" Content="Encrypt File" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptFileButton_Click"/>
+                                <Button x:Name="DecryptFileButton" Content="Decrypt File" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptFileButton_Click"/>
                             </ui:SimpleStackPanel>
                         </Grid>
 
                         <Grid Grid.Column="2">
                             <ui:SimpleStackPanel>
-                                <ui:SimpleStackPanel  Margin="12" Spacing="12">
-                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="256" ui:ControlHelper.Header="Cipher Text" AcceptsReturn="True"/>
+                                <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="320" ui:ControlHelper.Header="Cipher Text" AcceptsReturn="True"/>
                                 </ui:SimpleStackPanel>
                             </ui:SimpleStackPanel>
                         </Grid>
                     </Grid>
-
                 </ui:SimpleStackPanel>
             </Grid>
         </ui:SimpleStackPanel>
