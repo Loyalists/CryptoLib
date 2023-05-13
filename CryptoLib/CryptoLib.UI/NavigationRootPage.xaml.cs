@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CryptoLib.UI.Pages;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,9 +27,29 @@ namespace CryptoLib.UI
         public static Frame? RootFrame { get; set; }
         private bool _ignoreSelectionChange;
         private Type? _startPage = null;
+
+        //public Dictionary<Type, Page> PageInstances = new Dictionary<Type, Page>();
+        public ObservableCollection<ControlInfoDataItem> Pages = new ObservableCollection<ControlInfoDataItem>()
+        {
+            new ControlInfoDataItem(typeof(RSAPage), "RSA"),
+            new ControlInfoDataItem(typeof(DESPage), "DES"),
+        };
+
         public NavigationRootPage()
         {
             InitializeComponent();
+            PagesList.DataContext = Pages;
+            //foreach (var item in PagesList.Items.OfType<ControlInfoDataItem>())
+            //{
+            //    Page? instance = Activator.CreateInstance(item.PageType) as Page;
+            //    if (instance == null)
+            //    {
+            //        throw new Exception();
+            //    }
+
+            //    PageInstances.Add(item.PageType, instance);
+            //}
+
             RootFrame = rootFrame;
             if (_startPage != null)
             {
@@ -37,13 +59,13 @@ namespace CryptoLib.UI
             NavigateToSelectedPage();
         }
 
-        partial void SetStartPage();
-
         private void NavigateToSelectedPage()
         {
             if (PagesList.SelectedValue is Type type)
             {
-                RootFrame?.Navigate(type);
+                //RootFrame?.Navigate(PageInstances[type]);
+                int index = PagesList.SelectedIndex;
+                RootFrame?.Navigate(Pages[index].Instance);
             }
         }
 

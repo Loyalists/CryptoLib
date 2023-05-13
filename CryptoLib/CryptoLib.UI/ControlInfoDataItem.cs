@@ -11,24 +11,17 @@ using System.Windows.Interop;
 
 namespace CryptoLib.UI
 {
-    public class ControlPagesData : List<ControlInfoDataItem>
-    {
-        public ControlPagesData()
-        {
-            Add(new ControlInfoDataItem(typeof(RSAPage), "RSA"));
-            Add(new ControlInfoDataItem(typeof(DESPage), "DES"));
-        }
-    }
-
     public class ControlInfoDataItem
     {
         public Type PageType { get; }
         public string Title { get; }
+        public object? Instance { get; }
 
         public ControlInfoDataItem(Type pageType, string title)
         {
             PageType = pageType;
             Title = title;
+            Instance = Activator.CreateInstance(pageType);
         }
 
         public override string ToString()
