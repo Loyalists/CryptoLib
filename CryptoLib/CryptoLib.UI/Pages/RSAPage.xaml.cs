@@ -30,6 +30,8 @@ namespace CryptoLib.UI.Pages
     public partial class RSAPage : INotifyPropertyChanged
     {
         public int DefaultKeySize = 1024;
+        public RSAPaddingScheme DefaultPadding = RSAPaddingScheme.OAEP;
+        public string DefaultHashAlgorithm = "SHA256";
         public List<int> KeySizeList { get; } = new List<int>() { 
             128, 
             256, 
@@ -79,8 +81,8 @@ namespace CryptoLib.UI.Pages
             KeySizeComboBox.SelectedItem = KeySizeList.FirstOrDefault(x => x == DefaultKeySize);
             PublicKeyFormatComboBox.SelectedItem = PublicKeyFormatTypes.FirstOrDefault();
             PrivateKeyFormatComboBox.SelectedItem = PrivateKeyFormatTypes.FirstOrDefault();
-            PaddingSchemeComboBox.SelectedItem = PaddingSchemes.FirstOrDefault();
-            HashAlgorithmComboBox.SelectedItem = HashAlgorithmList.FirstOrDefault();
+            PaddingSchemeComboBox.SelectedItem = PaddingSchemes.FirstOrDefault(x => x == DefaultPadding);
+            HashAlgorithmComboBox.SelectedItem = HashAlgorithmList.FirstOrDefault(x => x == DefaultHashAlgorithm);
         }
 
         protected void OnPropertyChanged(string propertyName)

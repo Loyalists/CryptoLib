@@ -17,7 +17,7 @@
             <TextBlock Text="DES" Style="{StaticResource HeaderTextBlockStyle}" />
             <Grid>
                 <ui:SimpleStackPanel>
-                    <TextBlock TextWrapping="Wrap" Text="Key Manager/Generator" FontSize="16" FontWeight="Light"/>
+                    <TextBlock TextWrapping="Wrap" Text="Key Manager/Generator" FontSize="16" FontWeight="Light" Padding="12,0,0,0" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -53,7 +53,7 @@
                             </ui:SimpleStackPanel>
                         </Grid>
                     </Grid>
-                    <TextBlock TextWrapping="Wrap" Text="Encryption/Decryption" FontSize="16" FontWeight="Light"/>
+                    <TextBlock TextWrapping="Wrap" Text="Encryption/Decryption" FontSize="16" FontWeight="Light" Padding="12,0,0,0" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
