@@ -94,10 +94,10 @@ namespace CryptoLib.UI.Pages
         {
             int keySize = KeySizeList[KeySizeComboBox.SelectedIndex];
             var selectedPublicKeyFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
-            IKeyFormat publicKeyFormat = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedPublicKeyFormat);
+            IKeyFormat publicKeyFormat = RSAPublicKeyFormatType.CreateInstance(selectedPublicKeyFormat);
 
             var selectedPrivateKeyFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
-            IKeyFormat privateKeyFormat = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedPrivateKeyFormat);
+            IKeyFormat privateKeyFormat = RSAPrivateKeyFormatType.CreateInstance(selectedPrivateKeyFormat);
 
             RSAService service = new RSAService();
             service.KeySize = keySize;
@@ -127,7 +127,7 @@ namespace CryptoLib.UI.Pages
 
             string publicKeyText = PublicKeyTextBox.Text;
             var selectedPublicKeyFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
-            IKeyFormat publicKeyFormat = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedPublicKeyFormat);
+            IKeyFormat publicKeyFormat = RSAPublicKeyFormatType.CreateInstance(selectedPublicKeyFormat);
 
             string hash = HashAlgorithmList.ElementAt(HashAlgorithmComboBox.SelectedIndex);
             RSAPublicKey? publicKey;
@@ -173,7 +173,7 @@ namespace CryptoLib.UI.Pages
 
             string privateKeyText = PrivateKeyTextBox.Text;
             var selectedPrivateKeyFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
-            IKeyFormat privateKeyFormat = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedPrivateKeyFormat);
+            IKeyFormat privateKeyFormat = RSAPrivateKeyFormatType.CreateInstance(selectedPrivateKeyFormat);
 
             string hash = HashAlgorithmList.ElementAt(HashAlgorithmComboBox.SelectedIndex);
             RSAPrivateKey? privateKey;
@@ -226,7 +226,7 @@ namespace CryptoLib.UI.Pages
 
                 bool formatted = FormattedCheckBox.IsChecked == true;
                 var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
-                IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+                IKeyFormat format = RSAPublicKeyFormatType.CreateInstance(selectedFormat);
 
                 string keyText;
                 using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
@@ -261,7 +261,7 @@ namespace CryptoLib.UI.Pages
                 bool formatted = FormattedCheckBox.IsChecked == true;
                 string keyText = PublicKeyTextBox.Text;
                 var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
-                IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+                IKeyFormat format = RSAPublicKeyFormatType.CreateInstance(selectedFormat);
                 RSAPublicKey key = RSAPublicKey.FromString(keyText, format);
                 string keystr = key.ToString(format, formatted);
 
@@ -293,7 +293,7 @@ namespace CryptoLib.UI.Pages
 
                 bool formatted = FormattedCheckBox.IsChecked == true;
                 var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
-                IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+                IKeyFormat format = RSAPrivateKeyFormatType.CreateInstance(selectedFormat);
 
                 string keyText;
                 using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
@@ -328,7 +328,7 @@ namespace CryptoLib.UI.Pages
                 bool formatted = FormattedCheckBox.IsChecked == true;
                 string keyText = PrivateKeyTextBox.Text;
                 var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
-                IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+                IKeyFormat format = RSAPrivateKeyFormatType.CreateInstance(selectedFormat);
                 RSAPrivateKey key = RSAPrivateKey.FromString(keyText, format);
                 string keystr = key.ToString(format, formatted);
 
@@ -353,7 +353,7 @@ namespace CryptoLib.UI.Pages
             }
 
             var selectedFormat = PublicKeyFormatTypes.ElementAt(PublicKeyFormatComboBox.SelectedIndex);
-            IKeyFormat format = RSAKeyFormatType.CreatePublicKeyFormatInstance(selectedFormat);
+            IKeyFormat format = RSAPublicKeyFormatType.CreateInstance(selectedFormat);
             try
             {
                 RSAPublicKey key = RSAPublicKey.FromString(keyText, format);
@@ -376,7 +376,7 @@ namespace CryptoLib.UI.Pages
             }
 
             var selectedFormat = PrivateKeyFormatTypes.ElementAt(PrivateKeyFormatComboBox.SelectedIndex);
-            IKeyFormat format = RSAKeyFormatType.CreatePrivateKeyFormatInstance(selectedFormat);
+            IKeyFormat format = RSAPrivateKeyFormatType.CreateInstance(selectedFormat);
             try
             {
                 RSAPrivateKey key = RSAPrivateKey.FromString(keyText, format);
