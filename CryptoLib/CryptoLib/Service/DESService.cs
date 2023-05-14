@@ -70,7 +70,7 @@ namespace CryptoLib.Service
             byte[] result = bytes.ToArray();
             if (padding != null)
             {
-                result = padding.Decode(result, key, param);
+                result = padding.Decode(result, param);
             }
 
             return result;
@@ -122,7 +122,7 @@ namespace CryptoLib.Service
             byte[] message = data;
             if (padding != null)
             {
-                message = padding.Encode(data, key, param);
+                message = padding.Encode(data, param);
             }
 
             List<byte[]> messageBlocks = Helper.SplitByCount(message, BlockSize);

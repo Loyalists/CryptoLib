@@ -74,8 +74,15 @@ namespace CryptoLib.Service.Padding
             return hash;
         }
 
-        public byte[] Encode(byte[] data, IKey? key, IDictionary<string, object>? param = null)
+        public byte[] Encode(byte[] data, IDictionary<string, object>? param = null)
         {
+            if (param == null)
+            {
+                throw new ArgumentNullException(nameof(param));
+            }
+
+            IKey key = (IKey)param["RSAKey"];
+
             if (key is not RSAPublicKey)
             {
                 throw new InvalidCastException();
@@ -94,8 +101,15 @@ namespace CryptoLib.Service.Padding
             return padded;
         }
 
-        public byte[] Decode(byte[] data, IKey? key = null, IDictionary<string, object>? param = null)
+        public byte[] Decode(byte[] data, IDictionary<string, object>? param = null)
         {
+            if (param == null)
+            {
+                throw new ArgumentNullException(nameof(param));
+            }
+
+            IKey key = (IKey)param["RSAKey"];
+
             if (key is not RSAPrivateKey)
             {
                 throw new InvalidCastException();

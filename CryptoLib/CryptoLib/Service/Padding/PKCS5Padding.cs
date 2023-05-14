@@ -11,7 +11,7 @@ namespace CryptoLib.Service.Padding
 {
     public class PKCS5Padding : IPaddingScheme
     {
-        public byte[] Encode(byte[] data, IKey? key = null, IDictionary<string, object>? param = null)
+        public byte[] Encode(byte[] data, IDictionary<string, object>? param = null)
         {
             int blockSize = 8;
             int padLength = blockSize - data.Length % blockSize;
@@ -23,7 +23,7 @@ namespace CryptoLib.Service.Padding
             return padded.ToArray();
         }
 
-        public byte[] Decode(byte[] data, IKey? key = null, IDictionary<string, object>? param = null)
+        public byte[] Decode(byte[] data, IDictionary<string, object>? param = null)
         {
             List<byte> decrypted = data.ToList();
             int padLength = decrypted[decrypted.Count - 1];

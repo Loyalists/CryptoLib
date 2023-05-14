@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoLib.Algorithm;
@@ -104,11 +105,18 @@ namespace CryptoLib.Service
             RSAPublicKey publicKey = (RSAPublicKey)key;
             BigInteger n = publicKey.Modulus;
             BigInteger e = publicKey.PublicExponent;
+
+            if (param == null)
+            {
+                param = new Dictionary<string, object>();
+            }
+            param["RSAKey"] = publicKey;
+
             // OS2IP is in unsigned big endian
             byte[] padded = data;
             if (padding != null)
             {
-                padded = padding.Encode(data, key, param);
+                padded = padding.Encode(data, param);
             }
 
             BigInteger encoded = new BigInteger(padded, isUnsigned: true, isBigEndian: true);
@@ -147,12 +155,18 @@ namespace CryptoLib.Service
                 throw new ArgumentException("message too long");
             }
 
+            if (param == null)
+            {
+                param = new Dictionary<string, object>();
+            }
+            param["RSAKey"] = privateKey;
+
             BigInteger decrypted = RSA.Decrypt(encrypted, d, n);
             byte[] decryptedBytes = decrypted.ToByteArray(isUnsigned: true, isBigEndian: true);
             byte[] decoded = decryptedBytes;
             if (padding != null)
             {
-                decoded = padding.Decode(decryptedBytes, key, param);
+                decoded = padding.Decode(decryptedBytes, param);
             }
 
             return decoded;
