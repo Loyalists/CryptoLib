@@ -132,7 +132,7 @@ namespace CryptoLib.Test
             var tasks = new List<Task>();
             for (int i = 0; i < count; i++)
             {
-                var task = Task.Factory.StartNew(() =>
+                var task = Task.Run(() =>
                 {
                     RSAService service = new RSAService();
                     service.KeySize = keySize;
@@ -173,7 +173,7 @@ namespace CryptoLib.Test
             var tasks = new List<Task>();
             for (int i = 0; i < count; i++)
             {
-                var task = Task.Factory.StartNew(() =>
+                var task = Task.Run(() =>
                 {
                     var sw = Stopwatch.StartNew();
                     encrypted = service.Encrypt(plainText, publicKey);
@@ -194,7 +194,7 @@ namespace CryptoLib.Test
             totalTime = 0;
             for (int i = 0; i < count; i++)
             {
-                var task = Task.Factory.StartNew(() =>
+                var task = Task.Run(() =>
                 {
                     var sw = Stopwatch.StartNew();
                     decrypted = service.Decrypt(encrypted, privateKey);

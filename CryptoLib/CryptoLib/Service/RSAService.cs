@@ -42,11 +42,11 @@ namespace CryptoLib.Service
             {
                 var tasks = new List<Task>
                 {
-                    Task.Factory.StartNew(() =>
+                    Task.Run(() =>
                     {
                         p = MathHelper.GetRandomPrime(numSize);
                     }),
-                    Task.Factory.StartNew(() =>
+                    Task.Run(() =>
                     {
                         q = MathHelper.GetRandomPrime(numSize);
                     })
