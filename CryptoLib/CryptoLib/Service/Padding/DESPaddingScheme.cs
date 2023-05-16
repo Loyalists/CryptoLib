@@ -11,6 +11,7 @@ namespace CryptoLib.Service.Padding
     {
         None,
         PKCS5,
+        ANSIX923,
     }
 
     public static class DESPaddingSchemeFactory
@@ -19,6 +20,7 @@ namespace CryptoLib.Service.Padding
         {
             { DESPaddingScheme.None, null },
             { DESPaddingScheme.PKCS5, typeof(PKCS5Padding) },
+            { DESPaddingScheme.ANSIX923, typeof(ANSIX923Padding) },
         };
 
         public static IPaddingScheme? CreateInstance(DESPaddingScheme padding)
