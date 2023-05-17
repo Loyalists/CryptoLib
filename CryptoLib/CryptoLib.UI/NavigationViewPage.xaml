@@ -16,6 +16,7 @@
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Content="RSA" Tag="RSA" Icon="Permissions" />
                 <muxc:NavigationViewItem Content="DES" Tag="DES" Icon="Permissions" />
+                <muxc:NavigationViewItem Content="3DES" Tag="3DES" Icon="Permissions" />
             </muxc:NavigationView.MenuItems>
             <ui:Frame
                 x:Name="rootFrame"

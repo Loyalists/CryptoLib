@@ -27,6 +27,7 @@ namespace CryptoLib.UI
         {
             { "RSA", new RSAPage() },
             { "DES", new DESPage() },
+            { "3DES", new TDESPage() },
         };
 
         public NavigationViewPage()

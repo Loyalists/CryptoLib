@@ -1,0 +1,99 @@
+﻿<ui:Page x:Class="CryptoLib.UI.Pages.TDESPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:CryptoLib.UI.Pages"
+      xmlns:ui="http://schemas.modernwpf.com/2019"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:util="clr-namespace:CryptoLib.UI.Utility"
+      mc:Ignorable="d" 
+      d:DesignHeight="810" d:DesignWidth="1440"
+      Title="TDESPage"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <ScrollViewer>
+        <ui:SimpleStackPanel Margin="12" Spacing="12">
+            <TextBlock Text="Triple DES" Style="{StaticResource HeaderTextBlockStyle}" />
+            <Grid>
+                <ui:SimpleStackPanel>
+                    <TextBlock TextWrapping="Wrap" Text="Key Manager/Generator" FontSize="16" FontWeight="Light" Padding="12,0,0,0" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" MinWidth="200"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                <TextBox x:Name="PassphraseTextBox" TextWrapping="Wrap" Text="" MinHeight="98" ui:ControlHelper.Header="Passphrase"/>
+                                <TextBox x:Name="SaltForKeyGeneratorTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt (for key generation only)"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>                        
+                        
+                        <Grid Grid.Column="1">
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                <TextBox x:Name="KeyTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Key"/>
+                                <TextBox x:Name="SaltTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="Salt"/>
+                                <TextBox x:Name="IVTextBox" TextWrapping="Wrap" Text="" ui:ControlHelper.Header="IV"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="2">
+                            <Grid.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                            </Grid.Background>
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                <ComboBox x:Name="KeyFormatComboBox" ui:ControlHelper.Header="Key Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=KeyFormats}"/>
+                                <Button x:Name="GenerateButton" Content="Generate" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateButton_Click"/>
+                                <Button x:Name="GenerateIVButton" Content="Generate IV" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="GenerateIVButton_Click"/>
+                                <Button x:Name="OpenKeyButton" Content="Open" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="OpenKeyButton_Click"/>
+                                <Button x:Name="SaveKeyButton" Content="Save As" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="SaveKeyButton_Click"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Text="Encryption/Decryption" FontSize="16" FontWeight="Light" Padding="12,0,0,0" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <ui:SimpleStackPanel>
+                                <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                    <TextBox x:Name="PlainTextBox" TextWrapping="Wrap" Text="" MinHeight="320" ui:ControlHelper.Header="Plain Text" AcceptsReturn="True"/>
+                                </ui:SimpleStackPanel>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <Grid.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                            </Grid.Background>
+                            <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                <ComboBox x:Name="PaddingSchemeComboBox" ui:ControlHelper.Header="Padding Scheme" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=PaddingSchemes}"/>
+                                <ComboBox x:Name="ModeComboBox" ui:ControlHelper.Header="Mode" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=Modes}"/>
+                                <ComboBox x:Name="TextFormatComboBox" ui:ControlHelper.Header="Text Format" HorizontalAlignment="Stretch" ItemsSource="{Binding Path=TextFormats}"/>
+                                <Button x:Name="EncryptButton" Content="Encrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptButton_Click"/>
+                                <Button x:Name="DecryptButton" Content="Decrypt" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptButton_Click"/>
+                                <Button x:Name="EncryptFileButton" Content="Encrypt File" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="EncryptFileButton_Click"/>
+                                <Button x:Name="DecryptFileButton" Content="Decrypt File" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="DecryptFileButton_Click"/>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="2">
+                            <ui:SimpleStackPanel>
+                                <ui:SimpleStackPanel Margin="12" Spacing="12">
+                                    <TextBox x:Name="EncryptedTextBox" TextWrapping="Wrap" Text="" MinHeight="320" ui:ControlHelper.Header="Cipher Text" AcceptsReturn="True"/>
+                                </ui:SimpleStackPanel>
+                            </ui:SimpleStackPanel>
+                        </Grid>
+                    </Grid>
+                </ui:SimpleStackPanel>
+            </Grid>
+        </ui:SimpleStackPanel>
+    </ScrollViewer>
+</ui:Page>

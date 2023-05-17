@@ -19,6 +19,9 @@
     <Compile Update="NavigationViewPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Pages\TDESPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Pages\DESPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
