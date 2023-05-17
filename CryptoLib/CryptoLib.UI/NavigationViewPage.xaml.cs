@@ -23,6 +23,8 @@ namespace CryptoLib.UI
 {
     public partial class NavigationViewPage : Page
     {
+        private string startPage = "RSA";
+
         public Dictionary<string, Page> PageInstances = new Dictionary<string, Page>()
         {
             { "RSA", new RSAPage() },
@@ -33,7 +35,26 @@ namespace CryptoLib.UI
         public NavigationViewPage()
         {
             InitializeComponent();
-            NavView.SelectedItem = NavView.MenuItems[0];
+            //NavView.SelectedItem = NavView.MenuItems[0];
+            NavigateToStartPage();
+        }
+
+        private void NavigateToStartPage()
+        {
+            foreach (var obj in NavView.MenuItems)
+            {
+                var item = obj as ContentControl;
+                if (item == null) 
+                {
+                    continue;
+                }
+
+                if (item.Tag != null && item.Tag.ToString() == startPage)
+                {
+                    NavView.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private void NavigationView_SelectionChanged(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewSelectionChangedEventArgs args)
