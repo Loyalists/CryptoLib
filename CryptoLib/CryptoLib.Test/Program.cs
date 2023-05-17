@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using CryptoLib.Algorithm;
 using CryptoLib.Algorithm.Key;
 using CryptoLib.Service;
@@ -13,6 +14,7 @@ using CryptoLib.Service.Format;
 using CryptoLib.Service.Padding;
 using CryptoLib.Utility;
 using CryptoLib.Service.Mode;
+using DES = System.Security.Cryptography.DES;
 
 namespace CryptoLib.Test
 {
@@ -88,7 +90,7 @@ namespace CryptoLib.Test
             DESService service = new DESService();
             service.Passphrase = passphrase;
             //service.Padding = DESPaddingScheme.None;
-            service.CipherMode = BlockCipherMode.CFB;
+            service.CipherMode = BlockCipherMode.ECB;
             Console.WriteLine($"padding:{Enum.GetName(typeof(DESPaddingScheme), service.Padding)}");
             Console.WriteLine($"mode:{Enum.GetName(typeof(BlockCipherMode), service.CipherMode)}");
 
@@ -116,6 +118,53 @@ namespace CryptoLib.Test
             else
             {
                 Console.WriteLine("DES implementation is NOT valid.");
+            }
+            Console.WriteLine();
+
+            DES des = DES.Create();
+            des.Padding = PaddingMode.PKCS7;
+            des.Mode = CipherMode.ECB;
+            ICryptoTransform encryptor = des.CreateEncryptor(key.Bytes, key.IV);
+            ICryptoTransform decryptor = des.CreateDecryptor(key.Bytes, key.IV);
+
+            byte[] encrypted_bytes_test;
+            string encrypted_test;
+            using (MemoryStream msEncrypt = new MemoryStream())
+            {
+                using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                    {
+                        swEncrypt.Write(message);
+                    }
+                    encrypted_bytes_test = msEncrypt.ToArray();
+                    encrypted_test = Convert.ToHexString(encrypted_bytes_test);
+                }
+            }
+            Console.WriteLine("encrypted_test:");
+            Console.WriteLine(encrypted_test);
+
+            string decrypted_test;
+            using (MemoryStream msDecrypt = new MemoryStream(encrypted_bytes_test))
+            {
+                using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                    {
+                        decrypted_test = srDecrypt.ReadToEnd();
+                    }
+                }
+            }
+            Console.WriteLine("decrypted_test:");
+            Console.WriteLine(decrypted_test);
+
+            if (decrypted == decrypted_test)
+            {
+                Console.WriteLine($"The result is identical to what is produced by the .NET implementation.");
+            }
+            else
+            {
+                Console.WriteLine($"The result is NOT identical to what is produced by the .NET implementation.");
             }
 
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
@@ -189,7 +238,7 @@ namespace CryptoLib.Test
             tasks.Clear();
             Console.WriteLine($"average:{totalTime / count} secs");
             Console.WriteLine($"encrypted:{encrypted}");
-            Console.WriteLine("");
+            Console.WriteLine();
 
             totalTime = 0;
             for (int i = 0; i < count; i++)
