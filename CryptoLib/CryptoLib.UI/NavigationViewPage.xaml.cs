@@ -38,6 +38,11 @@ namespace CryptoLib.UI
 
         private void NavigationView_SelectionChanged(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewSelectionChangedEventArgs args)
         {
+            if (args.SelectedItemContainer.Tag == null)
+            {
+                return;
+            }
+
             var navItemTag = args.SelectedItemContainer.Tag.ToString();
             if (navItemTag == null)
             {
