@@ -170,6 +170,47 @@ namespace CryptoLib.Test
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
         }
 
+        static void Test3DES()
+        {
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
+            string passphrase = "lol";
+            string message = "The quick brown fox jumps over the lazy dog";
+            TDESService service = new TDESService();
+            service.Passphrase = passphrase;
+            service.Padding = DESPaddingScheme.PKCS5;
+            service.CipherMode = BlockCipherMode.ECB;
+            Console.WriteLine($"padding:{Enum.GetName(typeof(DESPaddingScheme), service.Padding)}");
+            Console.WriteLine($"mode:{Enum.GetName(typeof(BlockCipherMode), service.CipherMode)}");
+
+            var keys = service.Generate();
+            TDESKey key = (TDESKey)keys[DESKeyType.Key];
+            Console.WriteLine($"key:{key}");
+            Console.WriteLine($"salt:{Convert.ToHexString(key.Salt)}");
+            Console.WriteLine($"IV:{Convert.ToHexString(key.IV)}");
+            Console.WriteLine("message:");
+            Console.WriteLine(message);
+
+            var encrypted = service.Encrypt(message, key);
+            Console.WriteLine("encrypted:");
+            Console.WriteLine(encrypted);
+            Console.WriteLine(Convert.ToHexString(Convert.FromBase64String(encrypted)));
+
+            var decrypted = service.Decrypt(encrypted, key);
+            Console.WriteLine("decrypted:");
+            Console.WriteLine(decrypted);
+
+            if (decrypted == message)
+            {
+                Console.WriteLine("3DES implementation is valid.");
+            }
+            else
+            {
+                Console.WriteLine("3DES implementation is NOT valid.");
+            }
+
+            Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} ended");
+        }
+
         static void TestRSAGenerateKey()
         {
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
@@ -263,10 +304,11 @@ namespace CryptoLib.Test
 
         static void Main(string[] args)
         {
-            TestRSA();
+            //TestRSA();
             //TestRSAGenerateKey();
             //TestRSAEncryptAndDecrypt();
-            TestDES();
+            //TestDES();
+            Test3DES();
         }
     }
 }

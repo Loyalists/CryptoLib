@@ -9,7 +9,7 @@
       xmlns:util="clr-namespace:CryptoLib.UI.Utility"
       mc:Ignorable="d" 
       d:DesignHeight="810" d:DesignWidth="1440"
-      Title="RSAPage"
+      Title="DESPage"
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <ScrollViewer>
