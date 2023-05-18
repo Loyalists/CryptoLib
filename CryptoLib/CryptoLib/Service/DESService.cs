@@ -32,6 +32,14 @@ namespace CryptoLib.Service
             return bytes;
         }
 
+        static public byte[] EncryptBlock(byte[] data, IKey key)
+        {
+            var encrypted = Algorithm.DES.Encrypt(data, key.ToByteArray());
+            byte[] bytes = new byte[BlockSize];
+            encrypted.CopyTo(bytes, 0);
+            return bytes;
+        }
+
         public byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             DESKey? deskey = key as DESKey;
@@ -43,17 +51,6 @@ namespace CryptoLib.Service
             if (deskey.IV == null)
             {
                 throw new InvalidOperationException();
-            }
-
-            bool disable_padding = false;
-            if (param != null)
-            {
-                object? _disable_padding;
-                bool success = param.TryGetValue("disable_padding", out _disable_padding);
-                if (success && _disable_padding != null)
-                {
-                    disable_padding = (bool)_disable_padding;
-                }
             }
 
             IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
@@ -79,7 +76,7 @@ namespace CryptoLib.Service
                 bytes.AddRange(block);
             }
             byte[] result = bytes.ToArray();
-            if (padding != null && disable_padding != true)
+            if (padding != null)
             {
                 result = padding.Decode(result, param);
             }
@@ -95,14 +92,6 @@ namespace CryptoLib.Service
             return result;
         }
 
-        static public byte[] EncryptBlock(byte[] data, IKey key)
-        {
-            var encrypted = Algorithm.DES.Encrypt(data, key.ToByteArray());
-            byte[] bytes = new byte[BlockSize];
-            encrypted.CopyTo(bytes, 0);
-            return bytes;
-        }
-
         public byte[] Encrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
         {
             DESKey? deskey = key as DESKey;
@@ -116,18 +105,6 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            bool disable_padding = false;
-            if (param != null)
-            {
-                object? _disable_padding;
-                bool success = param.TryGetValue("disable_padding", out _disable_padding);
-                if (success && _disable_padding != null)
-                {
-                    disable_padding = (bool)_disable_padding;
-                    Console.WriteLine(disable_padding);
-                }
-            }
-
             var func = EncryptBlock;
             IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
             IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
@@ -137,7 +114,7 @@ namespace CryptoLib.Service
             };
 
             byte[] message = data;
-            if (padding != null && disable_padding != true)
+            if (padding != null)
             {
                 message = padding.Encode(data, param);
             }

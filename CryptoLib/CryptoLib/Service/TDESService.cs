@@ -24,7 +24,24 @@ namespace CryptoLib.Service
         public static readonly int IVSize = 8;
         public static readonly int BlockSize = 8;
 
-        public byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
+        static public byte[] DecryptBlock(byte[] data, IKey key)
+        {
+            TDESKey? tdeskey = key as TDESKey;
+            if (tdeskey == null)
+            {
+                throw new InvalidOperationException();
+            }
+            List<DESKey> keys = tdeskey.ToDESKeys();
+            byte[] k3_decrypted = Algorithm.DES.Decrypt(data, keys[2].ToByteArray());
+            byte[] k2_encrypted = Algorithm.DES.Encrypt(k3_decrypted, keys[1].ToByteArray());
+            byte[] k1_decrypted = Algorithm.DES.Decrypt(k2_encrypted, keys[0].ToByteArray());
+
+            byte[] bytes = new byte[BlockSize];
+            k1_decrypted.CopyTo(bytes, 0);
+            return bytes;
+        }
+
+        static public byte[] EncryptBlock(byte[] data, IKey key)
         {
             TDESKey? tdeskey = key as TDESKey;
             if (tdeskey == null)
@@ -33,25 +50,57 @@ namespace CryptoLib.Service
             }
 
             List<DESKey> keys = tdeskey.ToDESKeys();
-            DESService service = new DESService();
-            service.Padding = Padding;
-            service.CipherMode = CipherMode;
+            byte[] k1_encrypted = Algorithm.DES.Encrypt(data, keys[0].ToByteArray());
+            byte[] k2_decrypted = Algorithm.DES.Decrypt(k1_encrypted, keys[1].ToByteArray());
+            byte[] k3_encrypted = Algorithm.DES.Encrypt(k2_decrypted, keys[2].ToByteArray());
 
-            if (param == null)
+            byte[] bytes = new byte[BlockSize];
+            k3_encrypted.CopyTo(bytes, 0);
+            return bytes;
+        }
+
+        public byte[] Decrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
+        {
+            TDESKey? tdeskey = key as TDESKey;
+            if (tdeskey == null)
             {
-                param = new Dictionary<string, object>();
+                throw new InvalidOperationException();
             }
 
-            Dictionary<string, object> param_no_padding = new Dictionary<string, object>(param)
+            if (tdeskey.IV == null)
             {
-                { "disable_padding", true }
+                throw new InvalidOperationException();
+            }
+
+            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
+            var func = DecryptBlock;
+            if (CipherMode == BlockCipherMode.CFB || CipherMode == BlockCipherMode.CTR)
+            {
+                func = EncryptBlock;
+            }
+
+            Dictionary<string, object> modeParams = new Dictionary<string, object>()
+            {
+                { "IV", tdeskey.IV },
             };
 
-            byte[] k3_decrypted = service.Decrypt(data, keys[2], param_no_padding);
-            byte[] k2_encrypted = service.Encrypt(k3_decrypted, keys[1], param_no_padding);
-            byte[] k1_decrypted = service.Decrypt(k2_encrypted, keys[0], param);
+            List<byte[]> encrypted = Helper.SplitByCount(data, BlockSize);
+            List<byte[]> decrypted = mode.Decrypt(encrypted, key, func, modeParams);
 
-            return k1_decrypted;
+            List<byte> bytes = new List<byte>();
+            for (int i = 0; i < decrypted.Count; i++)
+            {
+                byte[] block = decrypted[i];
+                bytes.AddRange(block);
+            }
+            byte[] result = bytes.ToArray();
+            if (padding != null)
+            {
+                result = padding.Decode(result, param);
+            }
+
+            return result;
         }
 
         public string Decrypt(string data, IKey key, IDictionary<string, object>? param = null)
@@ -70,26 +119,34 @@ namespace CryptoLib.Service
                 throw new InvalidOperationException();
             }
 
-            List<DESKey> keys = tdeskey.ToDESKeys();
-            DESService service = new DESService();
-            service.Padding = Padding;
-            service.CipherMode = CipherMode;
-
-            if (param == null)
+            if (tdeskey.IV == null)
             {
-                param = new Dictionary<string, object>();
+                throw new InvalidOperationException();
             }
 
-            Dictionary<string, object> param_no_padding = new Dictionary<string, object>(param)
+            var func = EncryptBlock;
+            IPaddingScheme? padding = DESPaddingSchemeFactory.CreateInstance(Padding);
+            IBlockCipherMode mode = BlockCipherModeFactory.CreateInstance(CipherMode);
+            Dictionary<string, object> modeParams = new Dictionary<string, object>()
             {
-                { "disable_padding", true }
+                { "IV", tdeskey.IV },
             };
 
-            byte[] k1_encrypted = service.Encrypt(data, keys[0], param);
-            byte[] k2_decrypted = service.Decrypt(k1_encrypted, keys[1], param_no_padding);
-            byte[] k3_encrypted = service.Encrypt(k2_decrypted, keys[2], param_no_padding);
+            byte[] message = data;
+            if (padding != null)
+            {
+                message = padding.Encode(data, param);
+            }
 
-            return k3_encrypted;
+            List<byte[]> messageBlocks = Helper.SplitByCount(message, BlockSize);
+            List<byte[]> encrypted = mode.Encrypt(messageBlocks, key, func, modeParams);
+            List<byte> bytes = new List<byte>();
+            foreach (byte[] block in encrypted)
+            {
+                bytes.AddRange(block);
+            }
+
+            return bytes.ToArray();
         }
 
         public string Encrypt(string data, IKey key, IDictionary<string, object>? param = null)
