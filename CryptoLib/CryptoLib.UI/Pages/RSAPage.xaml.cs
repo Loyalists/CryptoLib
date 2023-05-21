@@ -27,7 +27,7 @@ using System.Windows.Shapes;
 
 namespace CryptoLib.UI.Pages
 {
-    public partial class RSAPage : INotifyPropertyChanged
+    public partial class RSAPage
     {
         public int DefaultKeySize = 1024;
         public RSAPaddingScheme DefaultPadding = RSAPaddingScheme.OAEP;
@@ -73,8 +73,6 @@ namespace CryptoLib.UI.Pages
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public RSAPage()
         {
             InitializeComponent();
@@ -83,11 +81,6 @@ namespace CryptoLib.UI.Pages
             PrivateKeyFormatComboBox.SelectedItem = PrivateKeyFormatTypes.FirstOrDefault();
             PaddingSchemeComboBox.SelectedItem = PaddingSchemes.FirstOrDefault(x => x == DefaultPadding);
             HashAlgorithmComboBox.SelectedItem = HashAlgorithmList.FirstOrDefault(x => x == DefaultHashAlgorithm);
-        }
-
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
