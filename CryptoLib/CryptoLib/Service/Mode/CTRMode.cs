@@ -19,8 +19,8 @@ namespace CryptoLib.Service.Mode
             }
 
             byte[] IV = (byte[])properties["IV"];
-            List<byte[]> encryptedBlocks = new List<byte[]>(new byte[blocks.Count][]);
-            var tasks = new List<Task>();
+            List<byte[]> encryptedBlocks = new List<byte[]>(blocks.Count);
+            var tasks = new List<Task<byte[]>>();
 
             for (int i = 0; i < blocks.Count; i++)
             {
@@ -40,12 +40,17 @@ namespace CryptoLib.Service.Mode
                     byte[] text = blocks[idx];
                     byte[] encrypted = encryptFunc(input, key);
                     byte[] xor = text.XORBytes(encrypted);
-                    encryptedBlocks[idx] = xor;
+                    return xor;
                 });
                 tasks.Add(task);
             }
 
             Task.WhenAll(tasks).Wait();
+            foreach (var task in tasks)
+            {
+                encryptedBlocks.Add(task.Result);
+            }
+
             return encryptedBlocks;
         }
 
@@ -57,8 +62,8 @@ namespace CryptoLib.Service.Mode
             }
 
             byte[] IV = (byte[])properties["IV"];
-            List<byte[]> decryptedBlocks = new List<byte[]>(new byte[blocks.Count][]);
-            var tasks = new List<Task>();
+            List<byte[]> decryptedBlocks = new List<byte[]>(blocks.Count);
+            var tasks = new List<Task<byte[]>>();
 
             for (int i = 0; i < blocks.Count; i++)
             {
@@ -78,12 +83,17 @@ namespace CryptoLib.Service.Mode
                     byte[] text = blocks[idx];
                     byte[] decrypted = decryptFunc(input, key);
                     byte[] xor = text.XORBytes(decrypted);
-                    decryptedBlocks[idx] = xor;
+                    return xor;
                 });
                 tasks.Add(task);
 
             }
             Task.WhenAll(tasks).Wait();
+            foreach (var task in tasks)
+            {
+                decryptedBlocks.Add(task.Result);
+            }
+
             return decryptedBlocks;
         }
     }
