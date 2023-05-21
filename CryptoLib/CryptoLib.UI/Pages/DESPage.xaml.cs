@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
@@ -224,6 +225,11 @@ namespace CryptoLib.UI.Pages
 
         private DESKey GetKey()
         {
+            if (string.IsNullOrEmpty(KeyTextBox.Text))
+            {
+                throw new Exception("null or empty key");
+            }
+
             var selectedKeyFormat = KeyFormats.ElementAt(KeyFormatComboBox.SelectedIndex);
             byte[] bytes;
             byte[] salt;
@@ -378,17 +384,28 @@ namespace CryptoLib.UI.Pages
                 service.Padding = selectedPadding;
                 DESKey key = GetKey();
 
-                byte[] plainData = File.ReadAllBytes(path);
-                byte[] encrypted = service.Encrypt(plainData, key);
-                using (var stream = File.Open(path_save, FileMode.Create))
+                var sw = Stopwatch.StartNew();
+                EncryptFileButton.IsEnabled = false;
+                string buttonText = (string)EncryptFileButton.Content;
+                EncryptFileButton.Content = "Encrypting...";
+                await Task.Run(() =>
                 {
-                    using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                    byte[] plainData = File.ReadAllBytes(path);
+                    byte[] encrypted = service.Encrypt(plainData, key);
+                    using (var stream = File.Open(path_save, FileMode.Create))
                     {
-                        writer.Write(encrypted);
+                        using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                        {
+                            writer.Write(encrypted);
+                        }
                     }
-                }
+                });
+                EncryptFileButton.Content = buttonText;
+                EncryptFileButton.IsEnabled = true;
+                sw.Stop();
+                double time = sw.Elapsed.TotalSeconds;
 
-                await UIHelper.ShowSimpleDialog($"The encrypted file has been saved in {path_save}.");
+                await UIHelper.ShowSimpleDialog($"The encrypted file has been saved in {path_save}. Time elapsed: {time}");
             }
             catch (Exception ex)
             {
@@ -432,17 +449,28 @@ namespace CryptoLib.UI.Pages
                 service.Padding = selectedPadding;
                 DESKey key = GetKey();
 
-                byte[] encrypted = File.ReadAllBytes(path);
-                byte[] decrypted = service.Decrypt(encrypted, key);
-                using (var stream = File.Open(path_save, FileMode.Create))
+                var sw = Stopwatch.StartNew();
+                DecryptFileButton.IsEnabled = false;
+                string buttonText = (string)DecryptFileButton.Content;
+                DecryptFileButton.Content = "Decrypting...";
+                await Task.Run(() =>
                 {
-                    using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                    byte[] encrypted = File.ReadAllBytes(path);
+                    byte[] decrypted = service.Decrypt(encrypted, key);
+                    using (var stream = File.Open(path_save, FileMode.Create))
                     {
-                        writer.Write(decrypted);
+                        using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+                        {
+                            writer.Write(decrypted);
+                        }
                     }
-                }
+                });
+                DecryptFileButton.Content = buttonText;
+                DecryptFileButton.IsEnabled = true;
+                sw.Stop();
+                double time = sw.Elapsed.TotalSeconds;
 
-                await UIHelper.ShowSimpleDialog($"The decrypted file has been saved in {path_save}.");
+                await UIHelper.ShowSimpleDialog($"The decrypted file has been saved in {path_save}. Time elapsed: {time}");
             }
             catch (Exception ex)
             {
