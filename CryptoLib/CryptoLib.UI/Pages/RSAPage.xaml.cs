@@ -2,6 +2,7 @@
 using CryptoLib.Service;
 using CryptoLib.Service.Format;
 using CryptoLib.Service.Padding;
+using CryptoLib.UI.Control;
 using CryptoLib.UI.Utility;
 using CryptoLib.Utility;
 using Microsoft.Win32;

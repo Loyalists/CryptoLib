@@ -1,4 +1,4 @@
-﻿<ui:ContentDialog x:Class="CryptoLib.UI.Pages.KeyAnalyzer"
+﻿<ui:ContentDialog x:Class="CryptoLib.UI.Control.KeyAnalyzer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.modernwpf.com/2019"
