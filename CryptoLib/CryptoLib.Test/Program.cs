@@ -308,7 +308,35 @@ namespace CryptoLib.Test
             //TestRSAGenerateKey();
             //TestRSAEncryptAndDecrypt();
             //TestDES();
-            Test3DES();
+            //Test3DES();
+            List<Action> actions = new List<Action>()
+            {
+                TestRSA,
+                TestRSAGenerateKey,
+                TestRSAEncryptAndDecrypt,
+                TestDES,
+                Test3DES,
+            };
+
+            for (int i = 0; i < actions.Count; i++)
+            {
+                Console.WriteLine($"{i}.{actions[i].Method.Name}");
+            }
+            string? input = Console.ReadLine();
+            try
+            {
+                int num = Convert.ToInt32(input);
+                Action action = actions[num];
+                action();
+
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine(ex);
+            }
+
+            Console.WriteLine("press any key to continue");
+            Console.ReadKey();
         }
     }
 }
