@@ -215,19 +215,19 @@ namespace CryptoLib.Test
         {
             Console.WriteLine($"{MethodBase.GetCurrentMethod().Name} started");
             int count = 10;
-            int keySize = 1024;
+            int keySize = 2048;
             double totalTime = 0;
             Console.WriteLine($"key size:{keySize}");
             Console.WriteLine($"count:{count}");
             var tasks = new List<Task>();
             for (int i = 0; i < count; i++)
             {
-                var task = Task.Run(() =>
+                var task = Task.Run(async () =>
                 {
                     RSAService service = new RSAService();
                     service.KeySize = keySize;
                     var sw = Stopwatch.StartNew();
-                    service.Generate();
+                    await service.GenerateAsync();
                     sw.Stop();
                     double time = sw.Elapsed.TotalSeconds;
                     totalTime += time;

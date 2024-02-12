@@ -16,19 +16,66 @@ namespace CryptoLib.Service
     {
         public int KeySize { get; set; } = 1024;
         public RSAPaddingScheme Padding { get; set; } = RSAPaddingScheme.Textbook;
+        public int GenerateThreadCount = 4;
 
         public async Task<Dictionary<RSAKeyType, IKey>> GenerateAsync()
         {
-            Dictionary<RSAKeyType, IKey>? keys = null;
-            await Task.Run(() =>
-            {
-                keys = Generate();
-            });
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+            var tasks = new List<Task<(BigInteger p, BigInteger q)>>();
 
-            if (keys == null)
+            int numSize = KeySize / 2;
+            BigInteger p = BigInteger.One;
+            BigInteger q = BigInteger.One;
+            try
             {
-                throw new InvalidOperationException();
+                for (int i = 0; i < GenerateThreadCount; i++)
+                {
+                    var task = Task.Run(() =>
+                    {
+                        (BigInteger first, BigInteger second) = GenerateAsyncCore(numSize, token);
+                        return (first, second);
+                    }, token);
+                    tasks.Add(task);
+                }
+                var result = await Task.WhenAny(tasks);
+                tokenSource.Cancel();
+                p = result.Result.p;
+                q = result.Result.q;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
+
+            BigInteger n = Algorithm.RSA.GetModulus(p, q);
+            BigInteger lambda = Algorithm.RSA.GetLambda(p, q);
+            BigInteger e = Algorithm.RSA.GetPublicKeyExponent(lambda);
+            BigInteger d = Algorithm.RSA.GetPrivateKeyExponent(e, lambda);
+
+            var publicKey = new RSAPublicKey();
+            publicKey.Modulus = n;
+            publicKey.PublicExponent = e;
+
+            var privateKey = new RSAPrivateKey();
+            privateKey.Modulus = n;
+            privateKey.PublicExponent = e;
+            privateKey.PrivateExponent = d;
+            privateKey.Prime1 = p;
+            privateKey.Prime2 = q;
+            privateKey.Exponent1 = Algorithm.RSA.GetExponent(d, p);
+            privateKey.Exponent2 = Algorithm.RSA.GetExponent(d, q);
+            privateKey.Coefficient = Algorithm.RSA.GetCoefficient(q, p);
+
+            var keys = new Dictionary<RSAKeyType, IKey>
+            {
+                { RSAKeyType.PublicKey, publicKey },
+                { RSAKeyType.PrivateKey, privateKey }
+            };
 
             return keys;
         }
@@ -36,6 +83,85 @@ namespace CryptoLib.Service
         public Dictionary<RSAKeyType, IKey> Generate()
         {
             int numSize = KeySize / 2;
+            BigInteger p = BigInteger.One;
+            BigInteger q = BigInteger.One;
+
+            (p, q) = GenerateCore(numSize);
+
+            BigInteger n = Algorithm.RSA.GetModulus(p, q);
+            BigInteger lambda = Algorithm.RSA.GetLambda(p, q);
+            BigInteger e = Algorithm.RSA.GetPublicKeyExponent(lambda);
+            BigInteger d = Algorithm.RSA.GetPrivateKeyExponent(e, lambda);
+
+            var publicKey = new RSAPublicKey();
+            publicKey.Modulus = n;
+            publicKey.PublicExponent = e;
+
+            var privateKey = new RSAPrivateKey();
+            privateKey.Modulus = n;
+            privateKey.PublicExponent = e;
+            privateKey.PrivateExponent = d;
+            privateKey.Prime1 = p;
+            privateKey.Prime2 = q;
+            privateKey.Exponent1 = Algorithm.RSA.GetExponent(d, p);
+            privateKey.Exponent2 = Algorithm.RSA.GetExponent(d, q);
+            privateKey.Coefficient = Algorithm.RSA.GetCoefficient(q, p);
+
+            var keys = new Dictionary<RSAKeyType, IKey>
+            {
+                { RSAKeyType.PublicKey, publicKey },
+                { RSAKeyType.PrivateKey, privateKey }
+            };
+
+            return keys;
+        }
+
+        private (BigInteger p, BigInteger q) GenerateAsyncCore(int numSize, CancellationToken ct)
+        {
+            if (ct.IsCancellationRequested)
+            {
+                ct.ThrowIfCancellationRequested();
+            }
+
+            BigInteger p = BigInteger.One;
+            BigInteger q = BigInteger.One;
+            while (true)
+            {
+                var tasks = new List<Task>
+                {
+                    Task.Run(() =>
+                    {
+                        p = MathHelper.GetRandomPrime(numSize);
+                    }),
+                    Task.Run(() =>
+                    {
+                        q = MathHelper.GetRandomPrime(numSize);
+                    })
+                };
+                Task t = Task.WhenAll(tasks);
+                try
+                {
+                    t.Wait();
+                }
+                catch { }
+
+                BigInteger _n = Algorithm.RSA.GetModulus(p, q);
+                if (_n.GetBitLength() == KeySize)
+                {
+                    break;
+                }
+
+                if (ct.IsCancellationRequested)
+                {
+                    ct.ThrowIfCancellationRequested();
+                }
+            }
+
+            return (p, q);
+        }
+
+        private (BigInteger p, BigInteger q) GenerateCore(int numSize)
+        {
             BigInteger p = BigInteger.One;
             BigInteger q = BigInteger.One;
             while (true)
@@ -65,33 +191,7 @@ namespace CryptoLib.Service
                 }
             }
 
-
-            BigInteger n = Algorithm.RSA.GetModulus(p, q);
-            BigInteger lambda = Algorithm.RSA.GetLambda(p, q);
-            BigInteger e = Algorithm.RSA.GetPublicKeyExponent(lambda);
-            BigInteger d = Algorithm.RSA.GetPrivateKeyExponent(e, lambda);
-
-            var publicKey = new RSAPublicKey();
-            publicKey.Modulus = n;
-            publicKey.PublicExponent = e;
-
-            var privateKey = new RSAPrivateKey();
-            privateKey.Modulus = n;
-            privateKey.PublicExponent = e;
-            privateKey.PrivateExponent = d;
-            privateKey.Prime1 = p;
-            privateKey.Prime2 = q;
-            privateKey.Exponent1 = Algorithm.RSA.GetExponent(d, p);
-            privateKey.Exponent2 = Algorithm.RSA.GetExponent(d, q);
-            privateKey.Coefficient = Algorithm.RSA.GetCoefficient(q, p);
-
-            var keys = new Dictionary<RSAKeyType, IKey>
-            {
-                { RSAKeyType.PublicKey, publicKey },
-                { RSAKeyType.PrivateKey, privateKey }
-            };
-
-            return keys;
+            return (p, q);
         }
 
         public byte[] Encrypt(byte[] data, IKey key, IDictionary<string, object>? param = null)
